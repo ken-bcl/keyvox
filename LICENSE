@@ -1,21 +1,26 @@
-MIT License
+KEYVOX SAMPLE CODE LICENSE
 
-Copyright (c) 2023 Ken Okamoto
+Version 1.0, September 2023
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Copyright (c) 2023, KEYVOX, represented by Ken Okamoto. All rights reserved.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+このリポジトリに含まれるサンプルコードは、KEYVOXの優れた性能を最大限に利用するためのものです。このコードは、Google App Script（GAS）用に代表岡本が作成したもので、アイデア次第で多彩な利用ができるKEYVOXの体験を目的としています。
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+許可:
+
+1. 個人および商用目的でのソフトウェアの使用および変更
+2. KEYVOXの性能を最大限に活用するためのアイデアや改善をソフトウェアに反映すること
+
+制限:
+
+1. このソフトウェアまたはその派生物を販売することは禁止されています
+2. ソフトウェアの原著作者または著作権者を示唆するような方法での宣伝や販売活動は禁止されています
+
+免責:
+
+このソフトウェアは「現状のまま」提供され、明示または黙示を問わず、いかなる保証も伴わないものとします。特定の目的への適合性、商業的な利用可能性、および非侵害に関する黙示の保証を含め、但し限定されないすべての保証が否認されます。
+
+## 著作権表示:
+
+1. このソフトウェアの再配布や変更を行う際には、このライセンスの著作権表示を保持する必要があります。
+
