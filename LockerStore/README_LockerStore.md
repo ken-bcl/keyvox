@@ -1,4 +1,4 @@
-# LockerStoreGAS用サンプルコード
+# LockerStoreGAS用サンプルコード v2
 
 ## 📌 概要
 
