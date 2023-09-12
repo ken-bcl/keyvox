@@ -22,6 +22,8 @@ const client = new Client({
 });
 const fetch = require('node-fetch');
 
+const CHANNEL_ID = process.env.CHANNEL_ID; // Replit SecretからCHANNEL_IDを取得
+
 
 client.once('ready', () => {
   console.log('Bot is online and ready!');
@@ -35,7 +37,8 @@ client.on('messageCreate', async message => {
   // ここでメッセージの内容をログに出力
   console.log(`Message content: "${message.content}"`);
 
-  if (message.content === '開けて' && !message.author.bot) {
+  if (message.channel.id === CHANNEL_ID && message.content === '開けて' && !message.author.bot) { // CHANNEL_IDのチェックを追加
+
     console.log('Inside the condition.');
 
     // GASのWeb APIのURL
