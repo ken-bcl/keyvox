@@ -1,7 +1,13 @@
-//AketeDoorのNode.js用スクリプト
 const express = require('express');
+const { Client, GatewayIntentBits } = require('discord.js');
+const fetch = require('node-fetch');
+const crypto = require('crypto');
 const app = express();
 const PORT = 3000;
+const CHANNEL_ID = process.env.CHANNEL_ID;
+const API_KEY = process.env.API_KEY; // Replit SecretからAPI_KEYを取得
+const SECRET_KEY = process.env.SECRET_KEY; // Replit SecretからSECRET_KEYを取得
+const ENTRY_DEVICE_ID = process.env.ENTRY_DEVICE_ID; // Replit SecretからENTRY_DEVICE_IDを取得
 
 app.get('/', (req, res) => {
   res.send('Repl is alive!');
@@ -11,19 +17,13 @@ app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
-
-const { Client, GatewayIntentBits } = require('discord.js');
-
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent]
+    GatewayIntentBits.MessageContent
+  ]
 });
-const fetch = require('node-fetch');
-
-const CHANNEL_ID = process.env.CHANNEL_ID; // Replit SecretからCHANNEL_IDを取得
-
 
 client.once('ready', () => {
   console.log('Bot is online and ready!');
@@ -33,38 +33,19 @@ client.once('ready', () => {
 client.on('messageCreate', async message => {
   console.log(`Received message from ${message.author.tag}: ${message.content}`);
 
-  console.log('Before checking the message content.');
-  // ここでメッセージの内容をログに出力
-  console.log(`Message content: "${message.content}"`);
-
-  if (message.channel.id === CHANNEL_ID && message.content === '開けて' && !message.author.bot) { // CHANNEL_IDのチェックを追加
-
+  if (message.channel.id === CHANNEL_ID && message.content === '開けて' && !message.author.bot) {
     console.log('Inside the condition.');
 
-    // GASのWeb APIのURL
-    const GAS_API_URL = process.env.GAS_API_URL;
-
     try {
-      console.log('Sending request to GAS endpoint...');
-      const response = await fetch(GAS_API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          action: 'unlock',
-          deviceId: 'ENTRY_DEVICE_ID'  // 入り口のDeviceID
-        })
-      });
-      console.log('Received response from GAS endpoint.');
+      console.log('Sending unlock request...');
+      const startTime = Date.now();
+      const result = await unlockLock();
 
-      // レスポンスの内容をログに出力
-      const responseBody = await response.text();
-      console.log('Response body:', responseBody);
+      const endTime = Date.now();
+      const elapsedTime = endTime - startTime;
 
-      const result = JSON.parse(responseBody);
-      if (result.success) {
-        message.reply('ドアを開けました！');
+      if (result.code === "0" && result.msg === "success") {
+        message.reply(`ドアを開けました！（かかった時間：${elapsedTime}ミリ秒）`);
       } else {
         message.reply('エラーが発生しました。');
       }
@@ -72,9 +53,39 @@ client.on('messageCreate', async message => {
       console.error('Error:', error);
       message.reply('エラーが発生しました。');
     }
-
   }
-  console.log('After checking the message content.');
 });
 
 client.login(process.env.DISCORD_TOKEN);
+
+async function unlockLock() {
+  const apiName = "unlock";
+  const postParam = JSON.stringify({
+    "lockId": ENTRY_DEVICE_ID,
+    "flag": "1"
+  });
+
+  const date = new Date().toUTCString();
+  const digestHash = crypto.createHash('sha256').update(postParam).digest('base64');
+  const digest = "SHA-256=" + digestHash;
+
+  const stringToSign = `date: ${date}\nPOST /api/eagle-pms/v1/${apiName} HTTP/1.1\ndigest: ${digest}`;
+  const signature = crypto.createHmac('sha256', SECRET_KEY).update(stringToSign).digest('base64');
+
+  const headers = {
+    "date": date,
+    "authorization": `hmac username="${API_KEY}", algorithm="hmac-sha256", headers="date request-line digest", signature="${signature}"`,
+    "x-target-host": "default.pms",
+    "digest": digest,
+    "Content-Type": "application/json"
+  };
+
+  const url = "https://eco.blockchainlock.io/api/eagle-pms/v1/" + apiName;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: headers,
+    body: postParam
+  });
+
+  return await response.json();
+}
