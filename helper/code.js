@@ -104,6 +104,9 @@ function callApi(apiName, postParam) {
 
 
 //　デバッグ関数
+// 変数を宣言
+const EMAIL = 'youraddress@yourdomain.com';
+
 function sendMail(subject, body, email = EMAIL) { //　ログをメールする
     try {
         MailApp.sendEmail(email, subject, body);
