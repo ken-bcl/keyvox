@@ -1,4 +1,5 @@
 /*
+■ ■ ■　本関数の説明　■ ■ ■
 このヘルパーはKEYVOX APIをGASから簡単にコールするためのものです。
 呼び出したい関数からcallApi関数を呼び出します。
 利用の前にスクリプトエディタ上で、storeKeys関数を実行することで、安全にAPIキーがGAS側に保管されます。
@@ -34,7 +35,6 @@ function unlockLock() {
     // JSONとしてレスポンスを返す
     return JSON.parse(response.getContentText());
 }
-
 
 
 
@@ -98,4 +98,17 @@ function callApi(apiName, postParam) {
 
     var url = "https://eco.blockchainlock.io/api/eagle-pms/v1/" + apiName;
     return UrlFetchApp.fetch(url, options);
+}
+
+
+
+
+//　デバッグ関数
+function sendMail(subject, body, email = EMAIL) { //　ログをメールする
+    try {
+        MailApp.sendEmail(email, subject, body);
+        Logger.log(`Email sent with subject: ${subject}`);
+    } catch (error) {
+        Logger.log(`Error sending email: ${error.toString()}`);
+    }
 }
