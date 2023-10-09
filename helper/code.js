@@ -15,8 +15,24 @@ function storeKeys() {
 
 
 
+// サンプル１．ロックAPI　- createLockPinの呼び出し例
+function createLockPinFromGmail(pin, stime, etime, targetName) {
+    var postParam = JSON.stringify({
+        unitId: UNIT_ID,
+        pinCode: pin,
+        sTime: stime.toString(),
+        eTime: etime.toString(),
+        targetName: targetName
+    });
+    // ヘルパー関数を使ってAPIを呼び出す
+    var response = callApi('createLockPin', postParam);
 
-// サンプル１．ロックAPI - unlock の呼び出し例
+    return response;
+}
+
+
+
+// サンプル２．ロックAPI - unlock の呼び出し例
 function unlockLock() {
     var postParam = JSON.stringify({
         "lockId": ENTRY_DEVICE_ID,
@@ -38,7 +54,7 @@ function unlockLock() {
 
 
 
-// サンプル２．ロッカーAPI - unlockLockerの呼び出し例
+// サンプル３．ロッカーAPI - unlockLockerの呼び出し例
 function unlockLocker(boxNum) {
     console.log("unlockLocker関数が呼び出されました。ロッカー番号:", boxNum);
 
