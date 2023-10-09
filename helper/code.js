@@ -13,68 +13,52 @@ function storeKeys() {
   scriptProperties.setProperty('SECRET_KEY', 'ここに自分のAPIシークレットキー貼り付ける');
 }
 
+// 呼び出しサンプル　//
+// 必要な定数の宣言
+const UNIT_ID = "your_unit_id_value"; //ドアのIDをgetUnitAPIで取得
+const DEVICE_ID = "your_device_id_value"; //ロックのIDをgetUnitAPIで取得
 
-
-// サンプル１．ロックAPI　- createLockPinの呼び出し例
+// サンプル１．ロックAPI - createLockPinの呼び出し例
 function createLockPinFromGmail(pin, stime, etime, targetName) {
-    var postParam = JSON.stringify({
+    const postParam = {
         unitId: UNIT_ID,
         pinCode: pin,
         sTime: stime.toString(),
         eTime: etime.toString(),
         targetName: targetName
-    });
-    // ヘルパー関数を使ってAPIを呼び出す
-    var response = callApi('createLockPin', postParam);
+    };
 
-    return response;
+    return callApi('createLockPin', JSON.stringify(postParam));
 }
 
 
+// サンプル２．ロックAPI - unlockの呼び出し例
 
-// サンプル２．ロックAPI - unlock の呼び出し例
 function unlockLock() {
-    var postParam = JSON.stringify({
-        "lockId": ENTRY_DEVICE_ID,
-        "flag": "1" // 0 -> lock, 1 -> unlock
-    });
+    const postParam = {
+        lockId: DEVICE_ID,
+        flag: "1" // 0 -> lock, 1 -> unlock
+    };
 
-    // APIの名前
-    var apiName = "unlock";
-
-    // ヘルパー関数を使ってAPIを呼び出す
-    var response = callApi(apiName, postParam);
-
-    // レスポンスをログに記録
-    Logger.log(response.getContentText());
-
-    // JSONとしてレスポンスを返す
-    return JSON.parse(response.getContentText());
+    return callApi("unlock", JSON.stringify(postParam));
 }
 
 
 
 // サンプル３．ロッカーAPI - unlockLockerの呼び出し例
 function unlockLocker(boxNum) {
-    console.log("unlockLocker関数が呼び出されました。ロッカー番号:", boxNum);
-
     const postParam = {
-      "deviceId": DEVICE_ID,
-      "boxNum": boxNum
+        deviceId: DEVICE_ID,
+        boxNum: boxNum
     };
 
-    // APIヘルパーを呼び出す
-    var response = callApi("unlockLocker", JSON.stringify(postParam));
-
-    // レスポンスの内容をパースしてオブジェクトとして利用
+    let response = callApi("unlockLocker", JSON.stringify(postParam));
     let responseObject = JSON.parse(response);
 
     if (responseObject.code === "0" && responseObject.msg === "success") {
-        console.log("ロッカー番号 " + boxNum + " が正常にアンロックされました。");
-        return "解錠しました。荷物を取り出してください。";  // ユーザーに向けたメッセージを返す
+        return "解錠しました。荷物を取り出してください。";
     } else {
-        console.error("ロッカー番号 " + boxNum + " のアンロックに失敗しました：", responseObject.msg);
-        return "ロッカーの解錠に失敗しました。サポートにお問い合わせください。";  // エラーメッセージを返す
+        return "ロッカーの解錠に失敗しました。サポートにお問い合わせください。";
     }
 }
 
@@ -114,20 +98,4 @@ function callApi(apiName, postParam) {
 
     var url = "https://eco.blockchainlock.io/api/eagle-pms/v1/" + apiName;
     return UrlFetchApp.fetch(url, options);
-}
-
-
-
-
-//　デバッグ関数
-// 変数を宣言
-const EMAIL = 'youraddress@yourdomain.com';
-
-function sendMail(subject, body, email = EMAIL) { //　ログをメールする
-    try {
-        MailApp.sendEmail(email, subject, body);
-        Logger.log(`Email sent with subject: ${subject}`);
-    } catch (error) {
-        Logger.log(`Error sending email: ${error.toString()}`);
-    }
 }
