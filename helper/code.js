@@ -16,7 +16,8 @@ function storeKeys() {
 // 呼び出しサンプル　//
 // 必要な定数の宣言
 const UNIT_ID = "your_unit_id_value"; //ドアのIDをgetUnitAPIで取得
-const DEVICE_ID = "your_device_id_value"; //ロックのIDをgetUnitAPIで取得
+const LOCK_ID = "your_lock_id_value"; //ロックのIDをgetUnitAPIで取得
+const DEVICE_ID = "your_device_id_value"; //ロッカーのIDをgetUnitAPIで取得
 
 // サンプル１．ロックAPI - createLockPinの呼び出し例
 function createLockPinFromGmail(pin, stime, etime, targetName) {
@@ -36,7 +37,7 @@ function createLockPinFromGmail(pin, stime, etime, targetName) {
 
 function unlockLock() {
     const postParam = {
-        lockId: DEVICE_ID,
+        lockId: LOCK_ID,
         flag: "1" // 0 -> lock, 1 -> unlock
     };
 
