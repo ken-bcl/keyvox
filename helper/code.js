@@ -71,6 +71,11 @@ function callApi(apiName, postParam) {
     var scriptProperties = PropertiesService.getScriptProperties();
     var API_KEY = scriptProperties.getProperty('API_KEY');
     var SECRET_KEY = scriptProperties.getProperty('SECRET_KEY');
+    
+    if (!API_KEY || !SECRET_KEY) {
+        Logger.log("API_KEY or SECRET_KEY is not set");
+        return null;
+    }
 
     var d = new Date();
     var date = d.toUTCString();
@@ -98,5 +103,11 @@ function callApi(apiName, postParam) {
     };
 
     var url = "https://eco.blockchainlock.io/api/eagle-pms/v1/" + apiName;
-    return UrlFetchApp.fetch(url, options);
+
+    try {
+        return UrlFetchApp.fetch(url, options);
+    } catch (e) {
+        Logger.log(`API呼び出しエラー: ${e}`);
+        return null;
+    }
 }
