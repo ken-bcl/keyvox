@@ -1,0 +1,295 @@
+//QRScanLocker用HTMLサービス
+<!DOCTYPE html>
+<html>
+<head>
+  <title>QR Scan Locker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #video-container {
+      width: 80%;
+      position: relative;
+      /* z-index: -1; ← これを削除 */
+    }
+
+  #recordList {
+    overflow-y: auto; /* 追加: スクロールを有効に */
+    max-height: auto; /* 追加: 最大高さを指定 */
+    width: 80%; /* 追加: 幅を video-container と同じに */
+  }
+
+    video {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      object-fit: cover;
+    }
+    button {
+      font-size: 24px;
+      padding: 15px 30px;
+      margin-top: 20px;
+      z-index: 1;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+</head>
+
+
+<body>
+  <h1>QR Scan Locker</h1>
+  <div id="video-container">
+    <video id="video" autoplay></video>
+  </div>
+
+  <!-- OAuth button -->
+  <button id="authButton" onclick="authorize(); updateRecordList();" style="display:none;">Google認証</button>
+  <!-- 再スキャンボタン -->
+  <button id="rescan" onclick="resetUnlock(); updateRecordList();" style="display:none">再スキャン</button>
+  
+  <!-- 最新の10件の履歴を表示するエリア -->
+  <div id="recordList"></div>
+
+
+<script async src="https://apis.google.com/js/api.js"></script>
+
+  <script>
+
+    var isUnlocked = false; // アンロックが完了したかどうかのフラグ
+    var rescanButton; // この変数の初期化は後ほど行います
+
+
+
+    // ページが完全に読み込まれた後に実行
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof google === 'undefined' || typeof google.script === 'undefined') {
+      console.error("Google Apps Script API hasn't loaded yet.");
+      return;
+    }
+      isUnlocked = false; // フラグを明示的にリセット
+      rescanButton = document.getElementById('rescan');
+      checkAuthStatus();
+      updateRecordList(); 
+      window.addEventListener('resize', setVideoDimensions);
+      var video = document.getElementById('video');
+      if(video) {
+        video.addEventListener('play', function() {
+          tick();
+        });
+      }
+    });
+
+    // Function to set video dimensions
+    function setVideoDimensions() {
+      var video = document.getElementById('video');
+      if(video) { // videoがnullでないか確認
+        var videoWidth = video.offsetWidth;
+        video.style.height = videoWidth + 'px';
+      }
+    }
+
+function checkAuthStatus() {
+  google.script.run.withSuccessHandler(function(authenticated) {
+    var authButton = document.getElementById('authButton'); // IDでボタンを取得
+    var video = document.getElementById('video'); // video要素を取得
+
+    if (authenticated) {
+      authButton.style.display = 'none'; // 認証済みならボタンを非表示に
+
+      // カメラを起動
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+      .then(function(stream) {
+        video.srcObject = stream;
+        video.setAttribute("playsinline", true); // iOS対応
+        video.play();
+
+        // Set video dimensions dynamically here
+        video.addEventListener('loadedmetadata', function() {
+          var videoWidth = video.offsetWidth; // Get the video width in the client
+          video.style.height = videoWidth + 'px'; // Set the height to be the same as the width
+        });
+      })
+      .catch(function(err) {
+        console.log("An error occurred: " + err);
+      });
+
+    } else {
+      authButton.style.display = 'block'; // 未認証ならボタンを表示に
+
+      // カメラのストリームを停止（もし起動していたら）
+      if(video.srcObject) {
+        var stream = video.srcObject;
+        var tracks = stream.getTracks();
+        tracks.forEach(function(track) {
+          track.stop();
+        });
+        video.srcObject = null;
+      }
+    }
+  }).isAuthenticated();
+}
+
+
+    function authorize() {
+      google.script.run
+      .withSuccessHandler(function(url) {
+        window.top.location.href = url;
+      })
+      .withFailureHandler(function(error) {
+        console.error("Error during authorization: ", error);
+      })
+      .getAuthorizationUrl();
+    }
+
+    var canvasElement = document.createElement('canvas');
+    var canvas = canvasElement.getContext('2d');
+
+
+
+
+function resetUnlock() {
+  isUnlocked = false; // フラグをリセット
+  console.log("Resetting unlock...");
+  rescanButton.style.display = 'none'; // 再スキャンボタンを非表示にする
+  
+  // カメラを再起動
+  var video = document.getElementById('video');
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+  .then(function(stream) {
+    video.srcObject = stream;
+    video.setAttribute("playsinline", true); // iOS対応
+    video.play();
+  })
+  .catch(function(err) {
+    console.log("An error occurred: " + err);
+  });
+
+  tick(); // tick関数を再起動
+}
+
+
+
+function tick() {
+  // console.log("Tick function running. isUnlocked:", isUnlocked);
+
+  if(isUnlocked) {
+    // console.log("Exiting tick because isUnlocked is true");
+    return;  // 既にアンロック完了している場合はtickを終了
+  }
+
+  var video = document.getElementById('video');
+  // console.log("Video readyState:", video.readyState);
+  
+  if (video.readyState === video.HAVE_ENOUGH_DATA) {
+    // console.log("We have enough video data to proceed");
+    canvasElement.height = video.videoHeight;
+    canvasElement.width = video.videoWidth;
+    canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+    
+    var imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+    var code = jsQR(imageData.data, imageData.width, imageData.height, {
+      inversionAttempts: 'dontInvert',
+    });
+
+    // console.log("jsQR Code object:", code);
+    
+    if (code) {
+      console.log("Found QR code", code.data);
+
+      try {
+        var url = new URL(code.data);
+        var myParam = url.searchParams.get("id");  // 'id'は目的のパラメータ名
+        console.log("Parsed URL", url);
+        console.log("Parsed param id:", myParam);
+      } catch (error) {
+        console.error("URL parsing failed", error);
+        myParam = null;
+      }
+
+      // 60秒間の制限を開始
+      canUnlock = false;
+      setTimeout(function() {
+        canUnlock = true;
+      }, 60000);
+
+      // GASのunlockLocker関数を呼び出す前に、カメラのストリームを停止
+      var stream = video.srcObject;
+      var tracks = stream.getTracks();
+      console.log("Stopping camera stream tracks:", tracks);
+      tracks.forEach(function(track) {
+        track.stop();
+      });
+      video.srcObject = null;
+
+      rescanButton.style.display = 'block'; // 再スキャンボタンを表示
+
+      // GASのunlockLocker関数を呼び出す
+      // console.log("Calling GAS unlockLocker function");
+      google.script.run.withSuccessHandler(function(response) {
+        // console.log("Unlock success", response);
+        alert(response);
+        isUnlocked = true;  // アンロック成功したらフラグを立てる
+
+        // 成功した後でレコードリストを更新
+        updateRecordList();  // すでに定義してあるupdateRecordList関数を呼び出す
+
+      }).withFailureHandler(function(error) {
+        // console.log("Unlock failed", error);
+        alert("Error: " + error);
+      }).unlockLocker(myParam);
+    }
+  }
+
+  // console.log("Requesting next animation frame");
+  if (!isUnlocked) {
+    requestAnimationFrame(tick);  // 未アンロックなら繰り返し
+  }
+}
+
+
+function updateRecordList() {
+  google.script.run
+    .withSuccessHandler(function(messages) {
+      console.log("取得したレコード:", messages);
+      console.log("Type of messages:", typeof messages); 
+
+      var recordList = document.getElementById('recordList');
+      recordList.innerHTML = "<h3>最新の10件の履歴:</h3>"; 
+
+      if(messages.length === 0) {
+        console.log("レコードが存在しません");
+        var noDataItem = document.createElement('div');
+        noDataItem.textContent = "データが存在しません";
+        recordList.appendChild(noDataItem);
+        return;
+      }
+
+      messages.forEach(function(message) {
+        var listItem = document.createElement('div');
+        if (message.includes("失敗")) {
+          listItem.innerHTML = message.replace("失敗", "<span style='color:red;'>失敗</span>");
+        } else if (message.includes("解錠しました")) {
+          listItem.innerHTML = message.replace("解錠", "<span style='color:green;'>解錠</span>");
+        } else {
+          listItem.textContent = message;
+        }
+
+
+        recordList.appendChild(listItem);
+      });
+    })
+    .withFailureHandler(function(err) {
+      console.error("エラー:", err);
+    })
+    .getLatestTenUnlockRecords();
+}
+
+</script>
+</body>
+</html>
