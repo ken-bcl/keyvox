@@ -1,3 +1,33 @@
+//Google認証をしたユーザーがQRコードをスキャンしてロッカーを解錠するサンプルコードです。
+/*
+Google認証をGoogle Cloud PlatformのAPI and Service> Credentialで事前に設定します。
+スプレッドシートを作成して、それぞれ、log, box, group, user, accessのシートを作ります。
+
+box シート配列例
+deviceId	boxNum	encodedQr	number
+F822xxxxxxxxxxxx	00-00	Rjxxxxxxxxxxxxxxxxxxxxxxxxxxx1==	1
+F822xxxxxxxxxxxx	00-01	Rjxxxxxxxxxxxxxxxxxxxxxxxxxxx2==	2
+F822xxxxxxxxxxxx	00-02	Rjxxxxxxxxxxxxxxxxxxxxxxxxxxx3==	3
+
+
+user シート配列例
+User	Group
+taro.block@blockchainlock.io	1,2,3,4
+hanako.blocka@blockchainlock.io	1,2,3
+
+accesシート配列例
+Box	Group
+00-00	1,2
+00-01	1
+00-02	2
+
+groupシート配列例
+1	sec
+2	biz
+3	dev
+4	all
+*/
+
 function storeKeys() {
   var scriptProperties = PropertiesService.getScriptProperties();
   scriptProperties.setProperty('API_KEY', 'YOUR_API_KEY');
