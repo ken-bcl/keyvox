@@ -72,10 +72,19 @@ function doGet() {
       .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 }
 
+function isUserFromDomain(email) {
+  return email.endsWith('@yourdomain.com');
+}
 
 function isAuthenticated() {
   var service = getOAuthService();
-  return service.hasAccess();
+  if (service.hasAccess()) {
+    var userEmail = Session.getActiveUser().getEmail();
+    if (isUserFromDomain(userEmail)) {
+      return true; // 認証済みかつ yourdomain.com ドメインのユーザー
+    }
+  }
+  return false; // 認証済みでないか、yourdomain.com ドメインでないユーザー
 }
 
 function checkTokenExpiration() {
