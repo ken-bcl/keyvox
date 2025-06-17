@@ -1,3 +1,7 @@
+if (!chatLog || !inputBox || !sendButton) {
+  alert('chat-log や inputBox、sendButton の要素が見つかりません。index.html に追加してください。');
+}
+
 const chatLog = document.getElementById('chat-log');
 const sendButton = document.getElementById('send-button');
 const inputBox = document.getElementById('chat-input');
