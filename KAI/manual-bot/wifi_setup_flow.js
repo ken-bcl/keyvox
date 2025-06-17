@@ -129,13 +129,3 @@ function sendPromptToServer(prompt) {
     addMessage("ai", data.text);
   });
 }
-
-document.getElementById("chat-form").addEventListener("submit", function (e) {
-  e.preventDefault();
-  const inputEl = document.getElementById("user-input");
-  const value = inputEl.value.trim();
-  if (value === "") return;
-  inputEl.value = "";
-
-  handleUserTextInput(value);
-});
