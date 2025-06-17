@@ -422,44 +422,52 @@
             }
         }
 
-        // Function to call GAS backend which then calls Gemini API
-        async function callGeminiViaGAS(prompt, callback = null) {
-            showLoadingIndicator();
+        // Function to call GAS backend which then calls Gemini API
+        async function callGeminiViaGAS(prompt) {
+            showLoadingIndicator();
 
-            if (GAS_WEB_APP_URL === 'https://script.google.com/macros/s/AKfycbxzml5onddDpDyqbh4Aen6F0MC2TykWhgIpQak6mkodmrPU0WpUgcIRmSELrmCylgxM2g/exec') {
-                 addMessage('ai', 'バックエンド（Google Apps Script）が設定されていません。HTMLファイル内の `GAS_WEB_APP_URL` を設定してください。');
-                 hideLoadingIndicator();
-                 return;
-            }
-            
-            try {
-                const response = await fetch(GAS_WEB_APP_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'text/plain;charset=utf-8', // GASで正しく受け取るため
-                    },
-                    body: JSON.stringify({ prompt: prompt }) // プロンプトをJSONで送信
-                });
-                
-                const result = await response.json();
+            if (GAS_WEB_APP_URL === 'https://script.google.com/macros/s/AKfycbxzml5onddDpDyqbh4Aen6F0MC2TykWhgIpQak6mkodmrPU0WpUgcIRmSELrmCylgxM2g/exec') {
+                addMessage('ai', 'バックエンド（Google Apps Script）が設定されていません。HTMLファイル内の `GAS_WEB_APP_URL` を設定してください。');
+                hideLoadingIndicator();
+                return;
+            }
 
-                if (result.success && result.text) {
-                    addMessage('ai', result.text); 
-                    if (callback) {
-                        callback(result.text);
-                    }
-                } else {
-                    const errorMessage = result.error || '不明なエラーが発生しました。';
-                    addMessage('ai', `申し訳ありません、応答を生成できませんでした。エラー: ${errorMessage}`);
-                    console.error('GAS/Gemini API Error:', result);
+            // RAGとチャットを振り分けるキーワード
+            const ragKeywords = ['使い方', '設定', 'トラブル', 'マニュアル', '方法', '開かない', '接続', 'できない', 'パスワード', '合鍵'];
+            const isRagQuery = ragKeywords.some(keyword => prompt.includes(keyword));
+            const payload = {
+                prompt: prompt,
+                type: isRagQuery ? 'rag' : 'chat'
+            };
+            
+            try {
+                // ★★★★★ 修正点 ★★★★★
+                // mode: 'no-cors' を削除し、Content-Typeを'application/json'に変更
+                const response = await fetch(GAS_WEB_APP_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
-            } catch (error) {
-                addMessage('ai', 'バックエンドとの通信でエラーが発生しました。もう一度お試しください。');
-                console.error('Error calling GAS backend:', error);
-            } finally {
-                hideLoadingIndicator();
-            }
-        }
+                
+                const result = await response.json();
+
+                if (result.success && result.text) {
+                    addMessage('ai', result.text); 
+                } else {
+                    const errorMessage = result.error || '不明なエラーが発生しました。';
+                    addMessage('ai', `申し訳ありません、応答を生成できませんでした。エラー: ${errorMessage}`);
+                }
+            } catch (error) {
+                addMessage('ai', 'バックエンドとの通信でエラーが発生しました。もう一度お試しください。');
+                console.error('Error calling GAS backend:', error);
+            } finally {
+                hideLoadingIndicator();
+            }
+        }
 
         // --- View Management Functions ---
         function switchView(newView) {
