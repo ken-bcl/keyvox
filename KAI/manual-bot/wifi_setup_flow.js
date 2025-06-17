@@ -1,105 +1,81 @@
-const chatLog = document.getElementById('chat-log');
+const chatLog = document.getElementById('scrollable-content');
 
-// グローバルステート
-window.wifiSetupContext = {
+function startWifiSetupFlow() {
+  runWifiSetupFlow();
+}
+
+let wifiSetupContext = {
   active: false,
   step: null,
   data: {}
 };
 
-function addMessage(sender, text) {
-  const msg = document.createElement('div');
-  msg.classList.add('chat-message', sender);
-  msg.innerHTML = text;
-  chatLog.appendChild(msg);
-  chatLog.scrollTop = chatLog.scrollHeight;
-}
-
-function simulateQuickAction(action) {
-  if (action === 'wifi_setup') {
-    runWifiSetupFlow();
-  }
-}
-
 async function runWifiSetupFlow() {
   wifiSetupContext.active = true;
 
-  addMessage('ai', 'Wi-Fi設定を開始します。使用するQR1は電池式（LE）ですか？それともAC電源式ですか？');
-  const powerType = await waitUserInput(['電池式', 'AC電源式']);
+  const powerType = await askWithOptions(
+    'Wi-Fi設定を開始します。使用するQR1は電池式（LE）ですか？それともAC電源式ですか？',
+    ['電池式', 'AC電源式']
+  );
   wifiSetupContext.data.powerType = powerType;
-  addMessage('user', powerType);
 
-  if (powerType === '電池式') {
-    addMessage('ai', '接続頻度を選んでください。おすすめは「1日1回」です。');
-  } else {
-    addMessage('ai', '接続頻度は「常時」が推奨されます。');
-  }
-
-  const frequency = await waitUserInput(['常時', '1時間ごと', '6時間ごと', '12時間ごと', '1日1回', 'なし']);
+  const frequency = await askWithOptions(
+    powerType === '電池式'
+      ? '接続頻度を選んでください。おすすめは「1日1回」です。'
+      : '接続頻度は「常時」が推奨されます。',
+    ['常時', '1時間ごと', '6時間ごと', '12時間ごと', '1日1回', 'なし']
+  );
   wifiSetupContext.data.frequency = frequency;
-  addMessage('user', frequency);
 
   addMessage('ai', '接続するWi-FiのSSIDを入力してください。');
-  const ssid = await waitUserTextInput();
-  wifiSetupContext.data.ssid = ssid;
-  addMessage('user', ssid);
-
-  addMessage('ai', 'Wi-Fiのパスワードを入力してください。');
-  const password = await waitUserTextInput();
-  wifiSetupContext.data.password = password;
-  addMessage('user', password);
-
-  showWifiQr(wifiSetupContext.data);
+  wifiSetupContext.step = 'ssid';
 }
 
-function waitUserInput(options) {
+function askWithOptions(question, options) {
   return new Promise((resolve) => {
-    const container = document.createElement('div');
-    container.className = 'flex flex-wrap gap-2 mt-2 dynamic-message';
-    options.forEach((opt) => {
-      const btn = document.createElement('button');
-      btn.innerText = opt;
-      btn.className = 'bg-indigo-500 text-white px-4 py-2 rounded-full text-sm hover:bg-indigo-600 transition duration-200';
-      btn.onclick = () => {
-        container.remove();
-        resolve(opt);
-      };
-      container.appendChild(btn);
-    });
-    chatLog.appendChild(container);
-    chatLog.scrollTop = chatLog.scrollHeight;
+    addMessage('ai', question);
+    setTimeout(() => {
+      const container = document.createElement('div');
+      container.className = 'flex flex-wrap gap-2 mt-2 dynamic-message';
+      options.forEach((opt) => {
+        const btn = document.createElement('button');
+        btn.innerText = opt;
+        btn.className = 'bg-indigo-500 text-white px-4 py-2 rounded-full text-sm hover:bg-indigo-600 transition duration-200';
+        btn.onclick = () => {
+          addMessage('user', opt);
+          container.remove();
+          resolve(opt);
+        };
+        container.appendChild(btn);
+      });
+      chatLog.appendChild(container);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }, 300);
   });
 }
 
-function waitUserTextInput() {
-  return new Promise((resolve) => {
-    const inputContainer = document.createElement('div');
-    inputContainer.className = 'flex mt-2 items-center gap-2 dynamic-message';
+// チャット欄からの入力フック
+function handleUserTextInput(value) {
+  if (!wifiSetupContext.active || !wifiSetupContext.step) return;
 
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.className = 'border px-3 py-2 rounded-md w-full';
-    input.placeholder = 'ここに入力...';
+  const step = wifiSetupContext.step;
+  const data = wifiSetupContext.data;
 
-    const submitBtn = document.createElement('button');
-    submitBtn.innerText = '送信';
-    submitBtn.className = 'bg-green-500 text-white px-4 py-2 rounded-full text-sm hover:bg-green-600 transition duration-200';
-    submitBtn.onclick = () => {
-      const value = input.value.trim();
-      if (value !== '') {
-        inputContainer.remove();
-        resolve(value);
-      }
-    };
-
-    inputContainer.appendChild(input);
-    inputContainer.appendChild(submitBtn);
-    chatLog.appendChild(inputContainer);
-    chatLog.scrollTop = chatLog.scrollHeight;
-  });
+  if (step === 'ssid') {
+    data.ssid = value;
+    addMessage('user', value);
+    addMessage('ai', 'Wi-Fiのパスワードを入力してください。');
+    wifiSetupContext.step = 'password';
+  } else if (step === 'password') {
+    data.password = value;
+    addMessage('user', value);
+    wifiSetupContext.active = false;
+    wifiSetupContext.step = null;
+    generateAndShowQr(data);
+  }
 }
 
-function showWifiQr(data) {
+function generateAndShowQr(data) {
   const { ssid, password } = data;
   const qrText = `WIFI_SSID:${ssid}_PASS:${password}`;
   const qrUrl = `https://placehold.co/256x256/000/FFF?text=${encodeURIComponent(qrText)}`;
