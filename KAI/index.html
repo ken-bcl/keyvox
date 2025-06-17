@@ -142,6 +142,9 @@
                         <button class="bg-indigo-500 text-white px-4 py-2 rounded-full shadow-md text-sm hover:bg-indigo-600 transition duration-200" onclick="simulateQuickAction('initial_setup')">
                             🚀 初期設定を開始する
                         </button>
+                        <button onclick="simulateQuickAction('wifi_setup')">
+                            📶 Wi-Fi設定
+                        </button>
                         <button class="bg-indigo-500 text-white px-4 py-2 rounded-full shadow-md text-sm hover:bg-indigo-600 transition duration-200" onclick="simulateQuickAction('key_issue')">
                             🔑 合鍵を発行する
                         </button>
@@ -689,6 +692,13 @@
                 window.currentInitialSetupStep = 'awaiting_current_admin_pin';
                 setTimeout(() => { addMessage('user', '初期設定を開始したい'); }, 500);
                 setTimeout(() => { addMessage('ai', 'KEYVOXスマートロックの初期設定を開始しますね！まず、現在の**管理者暗証番号12桁**を入力してください。'); }, 1000);
+            }else if (scenario === 'wifi_setup') {
+                if (typeof startWifiSetupFlow === 'function') {
+                startWifiSetupFlow();
+                } else {
+                console.error("startWifiSetupFlow 関数が読み込まれていません。");
+                addMessage('ai', 'Wi-Fi設定の手順を開始できませんでした。もう一度お試しください。');
+                }
             } else if (scenario === 'register_shared_key') {
                 setTimeout(() => { addMessage('user', '受け取った合鍵を登録したい'); }, 500);
                 setTimeout(() => { addMessage('ai', '承知いたしました。登録したい合鍵の情報をQRコードから読み取るか、直接入力してください。QRコードのスキャンが必要な場合は、**『QRコードをスキャン』**ボタンを押してください。'); }, 1000);
@@ -1014,6 +1024,8 @@
         window.onload = function() {
             simulateAppLaunch();
         };
+    </script>
+    <script src="manual-bot/wifi_setup_flow.js">
     </script>
 </body>
 </html>
