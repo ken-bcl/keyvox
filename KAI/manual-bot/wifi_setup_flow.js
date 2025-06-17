@@ -4,11 +4,20 @@ function startWifiSetupFlow() {
   runWifiSetupFlow();
 }
 
+let wifiSetupContext = {
+  active: false,
+  step: null,
+  data: {}
+};
+
 async function runWifiSetupFlow() {
+  wifiSetupContext.active = true;
+
   const powerType = await askWithOptions(
     'Wi-Fi設定を開始します。使用するQR1は電池式（LE）ですか？それともAC電源式ですか？',
     ['電池式', 'AC電源式']
   );
+  wifiSetupContext.data.powerType = powerType;
 
   const frequency = await askWithOptions(
     powerType === '電池式'
@@ -16,28 +25,10 @@ async function runWifiSetupFlow() {
       : '接続頻度は「常時」が推奨されます。',
     ['常時', '1時間ごと', '6時間ごと', '12時間ごと', '1日1回', 'なし']
   );
+  wifiSetupContext.data.frequency = frequency;
 
   addMessage('ai', '接続するWi-FiのSSIDを入力してください。');
-  const ssid = await waitUserTextInput();
-
-  addMessage('ai', 'Wi-Fiのパスワードを入力してください。');
-  const password = await waitUserTextInput();
-
-  const qrText = `WIFI_SSID:${ssid}_PASS:${password}`;
-  const qrUrl = `https://placehold.co/256x256/000/FFF?text=${encodeURIComponent(qrText)}`;
-
-  addMessage('ai', `
-    下記のQRコードをQR1にかざしてください。
-    <img src="${qrUrl}" class="w-36 h-36 mx-auto my-4 rounded-lg border border-gray-300 shadow-md cursor-pointer" onclick="showQrModal('${qrUrl}')"/>
-    <p class="text-sm mt-2 text-center">タップで拡大・再タップで閉じます</p>
-  `);
-
-  setTimeout(() => {
-    addMessage('ai', 'クラウドの接続を待っています...');
-    setTimeout(() => {
-      addMessage('ai', 'KEYVOXクラウドへの接続が完了しました🚀');
-    }, 2000);
-  }, 1000);
+  wifiSetupContext.step = 'ssid';
 }
 
 function askWithOptions(question, options) {
@@ -63,31 +54,42 @@ function askWithOptions(question, options) {
   });
 }
 
-function waitUserTextInput() {
-  return new Promise((resolve) => {
-    const inputContainer = document.createElement('div');
-    inputContainer.className = 'flex mt-2 items-center gap-2 dynamic-message';
+// チャット欄からの入力フック
+function handleUserTextInput(value) {
+  if (!wifiSetupContext.active || !wifiSetupContext.step) return;
 
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.className = 'border px-3 py-2 rounded-md w-full';
-    input.placeholder = 'ここに入力...';
+  const step = wifiSetupContext.step;
+  const data = wifiSetupContext.data;
 
-    const submitBtn = document.createElement('button');
-    submitBtn.innerText = '送信';
-    submitBtn.className = 'bg-green-500 text-white px-4 py-2 rounded-full text-sm hover:bg-green-600 transition duration-200';
-    submitBtn.onclick = () => {
-      const value = input.value.trim();
-      if (value !== '') {
-        addMessage('user', value);
-        inputContainer.remove();
-        resolve(value);
-      }
-    };
+  if (step === 'ssid') {
+    data.ssid = value;
+    addMessage('user', value);
+    addMessage('ai', 'Wi-Fiのパスワードを入力してください。');
+    wifiSetupContext.step = 'password';
+  } else if (step === 'password') {
+    data.password = value;
+    addMessage('user', value);
+    wifiSetupContext.active = false;
+    wifiSetupContext.step = null;
+    generateAndShowQr(data);
+  }
+}
 
-    inputContainer.appendChild(input);
-    inputContainer.appendChild(submitBtn);
-    chatLog.appendChild(inputContainer);
-    chatLog.scrollTop = chatLog.scrollHeight;
-  });
+function generateAndShowQr(data) {
+  const { ssid, password } = data;
+  const qrText = `WIFI_SSID:${ssid}_PASS:${password}`;
+  const qrUrl = `https://placehold.co/256x256/000/FFF?text=${encodeURIComponent(qrText)}`;
+
+  addMessage('ai', `
+    下記のQRコードをQR1にかざしてください。
+    <img src="${qrUrl}" class="w-36 h-36 mx-auto my-4 rounded-lg border border-gray-300 shadow-md cursor-pointer" onclick="showQrModal('${qrUrl}')"/>
+    <p class="text-sm mt-2 text-center">タップで拡大・再タップで閉じます</p>
+  `);
+
+  setTimeout(() => {
+    addMessage('ai', 'クラウドの接続を待っています...');
+    setTimeout(() => {
+      addMessage('ai', 'KEYVOXクラウドへの接続が完了しました🚀');
+    }, 2000);
+  }, 1000);
 }
