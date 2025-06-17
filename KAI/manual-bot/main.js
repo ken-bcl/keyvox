@@ -2,7 +2,6 @@ const chatLog = document.getElementById('chat-log');
 const sendButton = document.getElementById('send-button');
 const inputBox = document.getElementById('chat-input');
 
-// グローバルなステート（再定義禁止）
 window.wifiSetupContext = {
   active: false,
   step: null,
@@ -32,24 +31,73 @@ sendButton.onclick = () => {
   }
 };
 
-function handleUserTextInput(input) {
-  if (!window.wifiSetupContext.active) return;
+function handleUserTextInput(value) {
+  if (!wifiSetupContext.active || !wifiSetupContext.step) return;
 
-  const step = window.wifiSetupContext.step;
+  const step = wifiSetupContext.step;
+  const data = wifiSetupContext.data;
 
   if (step === 'ssid') {
-    window.wifiSetupContext.data.ssid = input;
-    window.wifiSetupContext.step = 'password';
+    data.ssid = value;
+    addMessage('user', value);
     addMessage('ai', 'Wi-Fiのパスワードを入力してください。');
+    wifiSetupContext.step = 'password';
   } else if (step === 'password') {
-    window.wifiSetupContext.data.password = input;
-    window.wifiSetupContext.active = false;
-    showWifiQr();
+    data.password = value;
+    addMessage('user', '••••••••');  // パスワードを伏せ字で表示
+    wifiSetupContext.active = false;
+    wifiSetupContext.step = null;
+    generateAndShowQr(data);
   }
 }
 
-function showWifiQr() {
-  const { ssid, password } = window.wifiSetupContext.data;
+async function runWifiSetupFlow() {
+  wifiSetupContext.active = true;
+  wifiSetupContext.step = null;
+  wifiSetupContext.data = {};
+
+  const powerType = await askWithOptions(
+    'Wi-Fi設定を開始します。使用するQR1は電池式（LE）ですか？それともAC電源式ですか？',
+    ['電池式', 'AC電源式']
+  );
+  wifiSetupContext.data.powerType = powerType;
+
+  const freqPrompt = powerType === '電池式'
+    ? '接続頻度を選んでください。おすすめは「1日1回」です。'
+    : '接続頻度は「常時」が推奨されます。';
+
+  const frequency = await askWithOptions(freqPrompt, ['常時', '1時間ごと', '6時間ごと', '12時間ごと', '1日1回', 'なし']);
+  wifiSetupContext.data.frequency = frequency;
+
+  wifiSetupContext.step = 'ssid';
+  addMessage('ai', '接続するWi-FiのSSIDを入力してください。');
+}
+
+function askWithOptions(question, options) {
+  return new Promise((resolve) => {
+    addMessage('ai', question);
+    setTimeout(() => {
+      const container = document.createElement('div');
+      container.className = 'flex flex-wrap gap-2 mt-2 dynamic-message';
+      options.forEach((opt) => {
+        const btn = document.createElement('button');
+        btn.innerText = opt;
+        btn.className = 'bg-indigo-500 text-white px-4 py-2 rounded-full text-sm hover:bg-indigo-600 transition duration-200';
+        btn.onclick = () => {
+          addMessage('user', opt);
+          container.remove();
+          resolve(opt);
+        };
+        container.appendChild(btn);
+      });
+      chatLog.appendChild(container);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }, 300);
+  });
+}
+
+function generateAndShowQr(data) {
+  const { ssid, password } = data;
   const qrText = `WIFI_SSID:${ssid}_PASS:${password}`;
   const qrUrl = `https://placehold.co/256x256/000/FFF?text=${encodeURIComponent(qrText)}`;
 
@@ -65,47 +113,4 @@ function showWifiQr() {
       addMessage('ai', 'KEYVOXクラウドへの接続が完了しました🚀');
     }, 2000);
   }, 1000);
-}
-
-async function runWifiSetupFlow() {
-  window.wifiSetupContext.active = true;
-  window.wifiSetupContext.step = null;
-  window.wifiSetupContext.data = {};
-
-  addMessage('ai', 'Wi-Fi設定を開始します。使用するQR1は電池式（LE）ですか？それともAC電源式ですか？');
-  const powerType = await waitUserOption(['電池式', 'AC電源式']);
-  window.wifiSetupContext.data.powerType = powerType;
-
-  const freqMessage = powerType === '電池式'
-    ? '接続頻度を選んでください。おすすめは「1日1回」です。'
-    : '接続頻度は「常時」が推奨されます。';
-
-  const frequency = await waitUserOption(['常時', '1時間ごと', '6時間ごと', '12時間ごと', '1日1回', 'なし'], freqMessage);
-  window.wifiSetupContext.data.frequency = frequency;
-
-  window.wifiSetupContext.step = 'ssid';
-  addMessage('ai', '接続するWi-FiのSSIDを入力してください。');
-}
-
-function waitUserOption(options, prompt = '') {
-  return new Promise((resolve) => {
-    if (prompt) addMessage('ai', prompt);
-    const container = document.createElement('div');
-    container.className = 'flex flex-wrap gap-2 mt-2';
-
-    options.forEach(opt => {
-      const btn = document.createElement('button');
-      btn.innerText = opt;
-      btn.className = 'bg-indigo-500 text-white px-4 py-2 rounded-full text-sm hover:bg-indigo-600 transition duration-200';
-      btn.onclick = () => {
-        addMessage('user', opt);
-        container.remove();
-        resolve(opt);
-      };
-      container.appendChild(btn);
-    });
-
-    chatLog.appendChild(container);
-    chatLog.scrollTop = chatLog.scrollHeight;
-  });
 }
