@@ -1,3 +1,9 @@
+const chatLog = document.getElementById('scrollable-content');
+
+function startWifiSetupFlow() {
+  runWifiSetupFlow();
+}
+
 async function runWifiSetupFlow() {
   const powerType = await askWithOptions(
     'Wi-Fi設定を開始します。使用するQR1は電池式（LE）ですか？それともAC電源式ですか？',
@@ -84,8 +90,4 @@ function waitUserTextInput() {
     chatLog.appendChild(inputContainer);
     chatLog.scrollTop = chatLog.scrollHeight;
   });
-}
-
-function startWifiSetupFlow() {
-  runWifiSetupFlow();
 }
