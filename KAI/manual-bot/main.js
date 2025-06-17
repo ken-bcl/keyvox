@@ -1,6 +1,12 @@
+// まず、必要なHTML要素を全て取得します
 const chatLog = document.getElementById('chat-log');
 const sendButton = document.getElementById('send-button');
 const inputBox = document.getElementById('chat-input');
+
+// その後で、要素が正しく取得できたか（nullでないか）を確認します
+if (!chatLog || !inputBox || !sendButton) {
+  alert('chat-log や inputBox、sendButton の要素が見つかりません。index.html に追加してください。');
+}
 
 window.wifiSetupContext = {
   active: false,
@@ -12,8 +18,13 @@ function addMessage(sender, text) {
   const msg = document.createElement('div');
   msg.classList.add('chat-message', sender);
   msg.innerHTML = text;
-  chatLog.appendChild(msg);
-  chatLog.scrollTop = chatLog.scrollHeight;
+  // chatLogがnullでないことを確認してからappendChildを呼び出す
+  if (chatLog) {
+    chatLog.appendChild(msg);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  } else {
+    console.error("chatLog要素が見つからないため、メッセージを追加できません。");
+  }
 }
 
 function simulateQuickAction(action) {
@@ -22,54 +33,60 @@ function simulateQuickAction(action) {
   }
 }
 
-sendButton.onclick = () => {
-  const input = inputBox.value.trim();
-  if (input !== '') {
-    addMessage('user', input);
-    handleUserTextInput(input);
-    inputBox.value = '';
-  }
-};
+// sendButtonもnullチェックをしてからイベントリスナーを設定する
+if (sendButton) {
+  sendButton.onclick = () => {
+    const input = inputBox.value.trim();
+    if (input !== '') {
+      addMessage('user', input);
+      handleUserTextInput(input);
+      inputBox.value = '';
+    }
+  };
+} else {
+  console.error("sendButton要素が見つからないため、クリックイベントを設定できません。");
+}
+
 
 function handleUserTextInput(value) {
-  if (!wifiSetupContext.active || !wifiSetupContext.step) return;
+  if (!window.wifiSetupContext.active || !window.wifiSetupContext.step) return;
 
-  const step = wifiSetupContext.step;
-  const data = wifiSetupContext.data;
+  const step = window.wifiSetupContext.step;
+  const data = window.wifiSetupContext.data;
 
   if (step === 'ssid') {
     data.ssid = value;
     addMessage('user', value);
     addMessage('ai', 'Wi-Fiのパスワードを入力してください。');
-    wifiSetupContext.step = 'password';
+    window.wifiSetupContext.step = 'password';
   } else if (step === 'password') {
     data.password = value;
-    addMessage('user', '••••••••');  // パスワードを伏せ字で表示
-    wifiSetupContext.active = false;
-    wifiSetupContext.step = null;
+    addMessage('user', '••••••••'); 
+    window.wifiSetupContext.active = false;
+    window.wifiSetupContext.step = null;
     generateAndShowQr(data);
   }
 }
 
 async function runWifiSetupFlow() {
-  wifiSetupContext.active = true;
-  wifiSetupContext.step = null;
-  wifiSetupContext.data = {};
+  window.wifiSetupContext.active = true;
+  window.wifiSetupContext.step = null;
+  window.wifiSetupContext.data = {};
 
   const powerType = await askWithOptions(
     'Wi-Fi設定を開始します。使用するQR1は電池式（LE）ですか？それともAC電源式ですか？',
     ['電池式', 'AC電源式']
   );
-  wifiSetupContext.data.powerType = powerType;
+  window.wifiSetupContext.data.powerType = powerType;
 
   const freqPrompt = powerType === '電池式'
     ? '接続頻度を選んでください。おすすめは「1日1回」です。'
     : '接続頻度は「常時」が推奨されます。';
 
   const frequency = await askWithOptions(freqPrompt, ['常時', '1時間ごと', '6時間ごと', '12時間ごと', '1日1回', 'なし']);
-  wifiSetupContext.data.frequency = frequency;
+  window.wifiSetupContext.data.frequency = frequency;
 
-  wifiSetupContext.step = 'ssid';
+  window.wifiSetupContext.step = 'ssid';
   addMessage('ai', '接続するWi-FiのSSIDを入力してください。');
 }
 
@@ -90,8 +107,13 @@ function askWithOptions(question, options) {
         };
         container.appendChild(btn);
       });
-      chatLog.appendChild(container);
-      chatLog.scrollTop = chatLog.scrollHeight;
+      // chatLogがnullでないことを確認してからappendChildを呼び出す
+      if (chatLog) {
+        chatLog.appendChild(container);
+        chatLog.scrollTop = chatLog.scrollHeight;
+      } else {
+        console.error("chatLog要素が見つからないため、オプションボタンを追加できません。");
+      }
     }, 300);
   });
 }
