@@ -129,21 +129,3 @@ function sendPromptToServer(prompt) {
     addMessage("ai", data.text);
   });
 }
-
-function handleSend() {
-  const inputEl = document.getElementById("user-input");
-  const value = inputEl.value.trim();
-  if (value === "") return;
-  inputEl.value = "";
-
-  // ユーザー入力表示（常に必要）
-  handleUserTextInput(value);
-
-  // ✅ Wi-Fi設定中はKAIに送らない
-  if (currentFlow === 'wifi_setup' && wifiSetupContext.active && wifiSetupContext.step) {
-    return;
-  }
-
-  // ✅ 通常会話の場合はKAIへ送信
-  sendPromptToServer(value);
-}
