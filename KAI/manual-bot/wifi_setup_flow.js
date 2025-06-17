@@ -1,9 +1,6 @@
 const chatLog = document.getElementById('scrollable-content');
 
-let currentFlow = null; // "wifi_setup" など。nullは通常会話モード。
-
 function startWifiSetupFlow() {
-  currentFlow = 'wifi_setup';
   runWifiSetupFlow();
 }
 
@@ -57,34 +54,23 @@ function askWithOptions(question, options) {
   });
 }
 
-// ユーザーのテキスト入力ハンドラー
+// チャット欄からの入力フック
 function handleUserTextInput(value) {
-  // Wi-Fiフロー中はそちらを優先
-  if (currentFlow === 'wifi_setup' && wifiSetupContext.active && wifiSetupContext.step) {
-    handleWifiSetupStep(value);
-    return;
-  }
+  if (!wifiSetupContext.active || !wifiSetupContext.step) return;
 
-  // 通常会話処理
-  sendPromptToServer(value);
-}
-
-// Wi-Fi設定ステップ処理
-function handleWifiSetupStep(value) {
   const step = wifiSetupContext.step;
   const data = wifiSetupContext.data;
 
-  addMessage('user', value);
-
   if (step === 'ssid') {
     data.ssid = value;
+    addMessage('user', value);
     addMessage('ai', 'Wi-Fiのパスワードを入力してください。');
     wifiSetupContext.step = 'password';
   } else if (step === 'password') {
     data.password = value;
+    addMessage('user', value);
     wifiSetupContext.active = false;
     wifiSetupContext.step = null;
-    currentFlow = null; // フロー終了
     generateAndShowQr(data);
   }
 }
@@ -106,26 +92,4 @@ function generateAndShowQr(data) {
       addMessage('ai', 'KEYVOXクラウドへの接続が完了しました🚀');
     }, 2000);
   }, 1000);
-}
-
-// 汎用的なメッセージ追加関数（既存のものがあれば併用可）
-function addMessage(sender, text) {
-  const msg = document.createElement('div');
-  msg.className = `message ${sender}`;
-  msg.innerHTML = `<strong>${sender === 'ai' ? 'KAI' : 'あなた'}:</strong> ${text}`;
-  chatLog.appendChild(msg);
-  chatLog.scrollTop = chatLog.scrollHeight;
-}
-
-// サーバー送信関数（通常会話モード用）
-function sendPromptToServer(prompt) {
-  fetch('/api', {
-    method: 'POST',
-    body: JSON.stringify({ prompt }),
-    headers: { 'Content-Type': 'application/json' }
-  })
-  .then(res => res.json())
-  .then(data => {
-    addMessage("ai", data.text);
-  });
 }
