@@ -71,19 +71,22 @@ function showWifiQr() {
 async function runWifiSetupFlow() {
   wifiSetupContext = {
     active: true,
-    step: 'ssid',
+    step: null,
     data: {}
   };
 
   addMessage('ai', 'Wi-Fi設定を開始します。使用するQR1は電池式（LE）ですか？それともAC電源式ですか？');
   const powerType = await waitUserOption(['電池式', 'AC電源式']);
+  wifiSetupContext.data.powerType = powerType;
 
   const freqMessage = powerType === '電池式'
     ? '接続頻度を選んでください。おすすめは「1日1回」です。'
     : '接続頻度は「常時」が推奨されます。';
 
   const frequency = await waitUserOption(['常時', '1時間ごと', '6時間ごと', '12時間ごと', '1日1回', 'なし'], freqMessage);
+  wifiSetupContext.data.frequency = frequency;
 
+  // 👇ここでようやくテキスト入力に遷移（非同期終了後）
   addMessage('ai', '接続するWi-FiのSSIDを入力してください。');
   wifiSetupContext.step = 'ssid';
 }
