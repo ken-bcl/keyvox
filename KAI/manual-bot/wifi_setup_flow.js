@@ -1,3 +1,6 @@
+function startWifiSetupFlow() {
+  runWifiSetupFlow();
+}
 
 async function runWifiSetupFlow() {
   addMessage('bot', 'Wi-Fi設定を開始します。使用するQR1は電池式（LE）ですか？それともAC電源式ですか？');
@@ -28,6 +31,7 @@ function waitUserInput(options) {
     options.forEach((opt) => {
       const btn = document.createElement('button');
       btn.innerText = opt;
+      btn.className = 'bg-indigo-500 text-white px-4 py-2 rounded-full text-sm hover:bg-indigo-600 transition duration-200 m-1';
       btn.onclick = () => {
         addMessage('user', opt);
         container.remove();
