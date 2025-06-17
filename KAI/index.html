@@ -426,7 +426,7 @@
         async function callGeminiViaGAS(prompt, callback = null) {
             showLoadingIndicator();
 
-            if (GAS_WEB_APP_URL === 'ここにデプロイしたGASのURLを貼り付け') {
+            if (GAS_WEB_APP_URL === 'https://script.google.com/macros/s/AKfycbxzml5onddDpDyqbh4Aen6F0MC2TykWhgIpQak6mkodmrPU0WpUgcIRmSELrmCylgxM2g/exec') {
                  addMessage('ai', 'バックエンド（Google Apps Script）が設定されていません。HTMLファイル内の `GAS_WEB_APP_URL` を設定してください。');
                  hideLoadingIndicator();
                  return;
