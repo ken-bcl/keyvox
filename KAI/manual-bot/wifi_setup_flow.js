@@ -1,17 +1,69 @@
-const chatLog = document.getElementById('scrollable-content');
+// DOM要素の取得
+// ファイル1と2でIDが異なっていたため、IDを統一しました。
+// HTML側のチャットログのIDを 'chat-log' にしてください。
+const chatLog = document.getElementById('chat-log');
+const sendButton = document.getElementById('send-button');
+const inputBox = document.getElementById('chat-input');
 
-function startWifiSetupFlow() {
-  runWifiSetupFlow();
-}
-
+// Wi-Fiセットアップの状態を管理する変数
 let wifiSetupContext = {
   active: false,
   step: null,
   data: {}
 };
 
+/**
+ * チャットログにメッセージを追加する関数
+ * @param {string} sender - 'user' または 'ai'
+ * @param {string} text - 表示するメッセージ（HTML可）
+ */
+function addMessage(sender, text) {
+  const msg = document.createElement('div');
+  msg.classList.add('chat-message', sender);
+  msg.innerHTML = text; // QRコードのimgタグを表示するためにinnerHTMLを使用
+  chatLog.appendChild(msg);
+  chatLog.scrollTop = chatLog.scrollHeight; // 自動で一番下までスクロール
+}
+
+// 送信ボタンのクリックイベント
+sendButton.onclick = () => {
+  const input = inputBox.value.trim();
+  if (input !== '') {
+    // Wi-Fiセットアップ中であれば、その処理にテキストを渡す
+    if (wifiSetupContext.active && wifiSetupContext.step) {
+      handleUserTextInput(input);
+    } else {
+      // 通常のチャット機能（必要であればここに記述）
+      addMessage('user', input);
+    }
+    inputBox.value = ''; // 入力欄をクリア
+  }
+};
+
+// Enterキーでも送信できるように設定
+inputBox.addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') {
+    sendButton.onclick();
+  }
+});
+
+/**
+ * Wi-Fiセットアップフローを開始する
+ */
+function startWifiSetupFlow() {
+  runWifiSetupFlow();
+}
+
+/**
+ * Wi-Fiセットアップのメインフロー
+ */
 async function runWifiSetupFlow() {
-  wifiSetupContext.active = true;
+  // コンテキストを初期化
+  wifiSetupContext = {
+    active: true,
+    step: null,
+    data: {}
+  };
 
   const powerType = await askWithOptions(
     'Wi-Fi設定を開始します。使用するQR1は電池式（LE）ですか？それともAC電源式ですか？',
@@ -28,13 +80,19 @@ async function runWifiSetupFlow() {
   wifiSetupContext.data.frequency = frequency;
 
   addMessage('ai', '接続するWi-FiのSSIDを入力してください。');
-  wifiSetupContext.step = 'ssid';
+  wifiSetupContext.step = 'ssid'; // SSID入力待ち状態に設定
 }
 
+/**
+ * 質問と選択肢ボタンを表示し、ユーザーの選択を待つ
+ * @param {string} question - AIからの質問文
+ * @param {string[]} options - 選択肢の配列
+ * @returns {Promise<string>} ユーザーが選択した文字列
+ */
 function askWithOptions(question, options) {
   return new Promise((resolve) => {
     addMessage('ai', question);
-    setTimeout(() => {
+    setTimeout(() => { // 少し遅れてボタンを表示
       const container = document.createElement('div');
       container.className = 'flex flex-wrap gap-2 mt-2 dynamic-message';
       options.forEach((opt) => {
@@ -42,8 +100,8 @@ function askWithOptions(question, options) {
         btn.innerText = opt;
         btn.className = 'bg-indigo-500 text-white px-4 py-2 rounded-full text-sm hover:bg-indigo-600 transition duration-200';
         btn.onclick = () => {
-          addMessage('user', opt);
-          container.remove();
+          addMessage('user', opt); // ユーザーの選択をログに表示
+          container.remove(); // 選択肢ボタンを削除
           resolve(opt);
         };
         container.appendChild(btn);
@@ -54,27 +112,34 @@ function askWithOptions(question, options) {
   });
 }
 
-// チャット欄からの入力フック
+/**
+ * ユーザーからのテキスト入力を処理する
+ * @param {string} value - 入力されたテキスト
+ */
 function handleUserTextInput(value) {
   if (!wifiSetupContext.active || !wifiSetupContext.step) return;
 
   const step = wifiSetupContext.step;
   const data = wifiSetupContext.data;
 
+  addMessage('user', value); // ユーザーの入力をログに表示
+
   if (step === 'ssid') {
     data.ssid = value;
-    addMessage('user', value);
     addMessage('ai', 'Wi-Fiのパスワードを入力してください。');
-    wifiSetupContext.step = 'password';
+    wifiSetupContext.step = 'password'; // 次のステップへ
   } else if (step === 'password') {
     data.password = value;
-    addMessage('user', value);
-    wifiSetupContext.active = false;
+    wifiSetupContext.active = false; // フローを終了
     wifiSetupContext.step = null;
-    generateAndShowQr(data);
+    generateAndShowQr(data); // QRコードを生成
   }
 }
 
+/**
+ * QRコードを生成してチャットに表示する
+ * @param {object} data - SSIDとパスワードを含むデータオブジェクト
+ */
 function generateAndShowQr(data) {
   const { ssid, password } = data;
   const qrText = `WIFI_SSID:${ssid}_PASS:${password}`;
@@ -86,6 +151,7 @@ function generateAndShowQr(data) {
     <p class="text-sm mt-2 text-center">タップで拡大・再タップで閉じます</p>
   `);
 
+  // 接続待機中のメッセージを順次表示
   setTimeout(() => {
     addMessage('ai', 'クラウドの接続を待っています...');
     setTimeout(() => {
