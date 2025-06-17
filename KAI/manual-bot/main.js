@@ -2,7 +2,8 @@ const chatLog = document.getElementById('chat-log');
 const sendButton = document.getElementById('send-button');
 const inputBox = document.getElementById('chat-input');
 
-window.window.wifiSetupContext = {
+// グローバルなステート（再定義禁止）
+window.wifiSetupContext = {
   active: false,
   step: null,
   data: {}
@@ -11,7 +12,7 @@ window.window.wifiSetupContext = {
 function addMessage(sender, text) {
   const msg = document.createElement('div');
   msg.classList.add('chat-message', sender);
-  msg.innerHTML = text; // QRコード表示のためinnerHTMLに変更
+  msg.innerHTML = text;
   chatLog.appendChild(msg);
   chatLog.scrollTop = chatLog.scrollHeight;
 }
@@ -22,19 +23,11 @@ function simulateQuickAction(action) {
   }
 }
 
-// Wi-Fi セットアップ用ステート
-let window.wifiSetupContext = {
-  active: false,
-  step: null,
-  data: {}
-};
-
-// チャット送信処理（Wi-Fiセットアップ入力も処理）
 sendButton.onclick = () => {
   const input = inputBox.value.trim();
   if (input !== '') {
     addMessage('user', input);
-    handleUserTextInput(input); // Wi-Fiセットアップ中なら拾う
+    handleUserTextInput(input);
     inputBox.value = '';
   }
 };
@@ -75,11 +68,9 @@ function showWifiQr() {
 }
 
 async function runWifiSetupFlow() {
-  window.wifiSetupContext = {
-    active: true,
-    step: null,
-    data: {}
-  };
+  window.wifiSetupContext.active = true;
+  window.wifiSetupContext.step = null;
+  window.wifiSetupContext.data = {};
 
   addMessage('ai', 'Wi-Fi設定を開始します。使用するQR1は電池式（LE）ですか？それともAC電源式ですか？');
   const powerType = await waitUserOption(['電池式', 'AC電源式']);
@@ -92,8 +83,6 @@ async function runWifiSetupFlow() {
   const frequency = await waitUserOption(['常時', '1時間ごと', '6時間ごと', '12時間ごと', '1日1回', 'なし'], freqMessage);
   window.wifiSetupContext.data.frequency = frequency;
 
-  // 👇こいつがないと「active」状態が途中でfalseになる
-  window.wifiSetupContext.active = true;
   window.wifiSetupContext.step = 'ssid';
   addMessage('ai', '接続するWi-FiのSSIDを入力してください。');
 }
