@@ -84,3 +84,7 @@ function waitUserTextInput() {
     chatLog.scrollTop = chatLog.scrollHeight;
   });
 }
+
+function startWifiSetupFlow() {
+  runWifiSetupFlow();
+}
