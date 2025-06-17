@@ -86,9 +86,10 @@ async function runWifiSetupFlow() {
   const frequency = await waitUserOption(['常時', '1時間ごと', '6時間ごと', '12時間ごと', '1日1回', 'なし'], freqMessage);
   wifiSetupContext.data.frequency = frequency;
 
-  // 👇ここでようやくテキスト入力に遷移（非同期終了後）
-  addMessage('ai', '接続するWi-FiのSSIDを入力してください。');
+  // 👇こいつがないと「active」状態が途中でfalseになる
+  wifiSetupContext.active = true;
   wifiSetupContext.step = 'ssid';
+  addMessage('ai', '接続するWi-FiのSSIDを入力してください。');
 }
 
 function waitUserOption(options, prompt = '') {
