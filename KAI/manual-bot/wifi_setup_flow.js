@@ -108,7 +108,7 @@ QR1のWi-Fi設定情報：
   addMessage('ai', '設定内容を確認しています...');
 
   try {
-    const res = await fetch('https://script.google.com/macros/s/あなたのGASデプロイURL/exec', {
+    const res = await fetch('https://script.google.com/macros/s/AKfycbxzml5onddDpDyqbh4Aen6F0MC2TykWhgIpQak6mkodmrPU0WpUgcIRmSELrmCylgxM2g/exec', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
