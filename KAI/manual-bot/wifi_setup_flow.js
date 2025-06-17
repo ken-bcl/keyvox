@@ -4,7 +4,7 @@ function startWifiSetupFlow() {
   runWifiSetupFlow();
 }
 
-let wifiSetupContext = {
+window.wifiSetupContext = {
   active: false,
   step: null,
   data: {}
