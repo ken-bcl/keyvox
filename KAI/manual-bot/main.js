@@ -1,5 +1,5 @@
 const chatLog = document.getElementById('scrollable-content');
-let currentFlow = null; // "wifi_setup"など。nullは通常会話モード。
+let currentFlow = null;
 
 // メッセージを追加
 function addMessage(sender, text) {
@@ -23,7 +23,7 @@ function sendPromptToServer(prompt) {
   });
 }
 
-// Wi-Fiセットアップフロー
+// Wi-Fiセットアップ
 let wifiSetupContext = {
   active: false,
   step: null,
@@ -121,7 +121,15 @@ function generateAndShowQr(data) {
   }, 1000);
 }
 
-// 送信ボタン処理
+// FaceID認証通過後、UIを表示
+function proceedToChat() {
+  const chatArea = document.getElementById('chat-area');
+  if (chatArea) {
+    chatArea.classList.remove('hidden');
+  }
+}
+
+// 送信処理
 function handleSend() {
   const inputEl = document.getElementById("user-input");
   const value = inputEl.value.trim();
@@ -144,7 +152,14 @@ document.addEventListener('DOMContentLoaded', () => {
   if (sendBtn) {
     sendBtn.addEventListener('click', handleSend);
   }
+
+  const faceidBtn = document.getElementById('faceid-button');
+  if (faceidBtn) {
+    faceidBtn.addEventListener('click', () => {
+      addMessage('user', 'Face IDで認証しました');
+      proceedToChat();
+    });
+  }
 });
 
-// グローバル関数
 window.startWifiSetupFlow = startWifiSetupFlow;
