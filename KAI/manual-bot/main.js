@@ -758,41 +758,4 @@ function generateAndShowQr(data) {
 
 
 
-function onSendClick() {
-  const inputElement = document.getElementById('chat-input');
-  const userText = inputElement.value.trim();
-  if (!userText) return;
 
-  // ユーザーのメッセージをチャットログに追加（任意）
-  addMessage('user', userText);
-
-  // 入力欄をクリア
-  inputElement.value = '';
-
-  const GAS_URL = "https://script.google.com/macros/s/AKfycbxzml5onddDpDyqbh4Aen6F0MC2TykWhgIpQak6mkodmrPU0WpUgcIRmSELrmCylgxM2g/exec";
-
-  fetch(GAS_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query: userText })
-  })
-  .then(response => response.json())
-  .then(data => {
-    // ▼ Notion デバッグ情報をログ出力
-    if (data.debug && Array.isArray(data.debug)) {
-      console.log('▼ Notion デバッグ情報');
-      data.debug.forEach((entry, index) => {
-        console.log(`${index + 1}. ${entry.title} → ${entry.url}`);
-      });
-    }
-
-    // ▼ レスポンスメッセージを画面に表示
-    if (data.messages) {
-      displayResponse(data.messages.join("\n"));
-    }
-  })
-  .catch(error => {
-    console.error("エラー:", error);
-  });
-}
-window.onSendClick = onSendClick;
