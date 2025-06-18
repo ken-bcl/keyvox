@@ -756,6 +756,9 @@ function generateAndShowQr(data) {
   }, 1000);
 }
 
+
+
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxzml5onddDpDyqbh4Aen6F0MC2TykWhgIpQak6mkodmrPU0WpUgcIRmSELrmCylgxM2g/exec";
 fetch(GAS_URL, {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
