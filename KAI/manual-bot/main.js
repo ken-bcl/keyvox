@@ -755,3 +755,27 @@ function generateAndShowQr(data) {
     }, 2000);
   }, 1000);
 }
+
+fetch(GAS_URL, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ query: userText })
+})
+.then(response => response.json())
+.then(data => {
+  // ここでデバッグ情報をログ出力
+  if (data.debug && Array.isArray(data.debug)) {
+    console.log('▼ Notion デバッグ情報');
+    data.debug.forEach((entry, index) => {
+      console.log(`${index + 1}. ${entry.title} → ${entry.url}`);
+    });
+  }
+
+  // 実際のレスポンスメッセージも表示
+  if (data.messages) {
+    displayResponse(data.messages.join("\n"));
+  }
+})
+.catch(error => {
+  console.error("エラー:", error);
+});
