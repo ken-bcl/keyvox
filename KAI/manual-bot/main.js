@@ -9,38 +9,55 @@
         let currentView = 'main'; // 'main', 'myPage', 'login', 'register'
 
         // Helper function to add a message to the chat area
-        function addMessage(sender, textOrHtml) {
-            const chatArea = document.getElementById('scrollable-content');
-            const messageDiv = document.createElement('div');
-            // Add a class for easy removal of dynamic messages
-            messageDiv.classList.add('dynamic-message', 'flex', 'items-start', 'space-x-2');
+       // Helper function to add a message to the chat area
+      function addMessage(sender, textOrHtml) {
+          const chatArea = document.getElementById('scrollable-content');
+          const messageDiv = document.createElement('div');
+          // Add a class for easy removal of dynamic messages
+          messageDiv.classList.add('dynamic-message', 'flex', 'items-start', 'space-x-2');
 
-            if (!chatArea || currentView !== 'main') {
-                console.warn('Attempted to add message to a non-main chat view. Suppressing.');
-                return;
-            }
+          if (!chatArea || currentView !== 'main') {
+              console.warn('Attempted to add message to a non-main chat view. Suppressing.');
+              return;
+          }
 
-            if (sender === 'ai') {
-                messageDiv.innerHTML = `
-                    <div class="flex-shrink-0">
-                        <img src="https://placehold.co/40x40/6366F1/FFFFFF?text=KAI" alt="KAI Avatar" class="rounded-full">
-                    </div>
-                    <div class="bg-indigo-200 text-indigo-900 p-3 rounded-tr-2xl rounded-br-2xl rounded-bl-2xl max-w-[75%] animate-fade-in">
-                        ${textOrHtml}
-                    </div>
-                `;
-            } else { // sender === 'user'
-                messageDiv.classList.remove('items-start');
-                messageDiv.classList.add('justify-end');
-                messageDiv.innerHTML = `
-                    <div class="bg-green-200 text-green-900 p-3 rounded-tl-2xl rounded-bl-2xl rounded-br-2xl rounded-tr-2xl max-w-[75%] animate-fade-in">
-                        ${textOrHtml}
-                    </div>
-                `;
-            }
-            chatArea.appendChild(messageDiv);
-            chatArea.scrollTop = chatArea.scrollHeight;
-        }
+          // ★★★★★★★★★ ここからが変更点 ★★★★★★★★★
+
+          // URLを検出するための正規表現
+          const urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+          
+          // 渡されたテキストにHTMLタグが既に含まれているか簡易的にチェック
+          const containsHtml = /<[a-z][\s\S]*>/i.test(textOrHtml);
+          
+          let processedContent = textOrHtml;
+          // HTMLタグが含まれていないプレーンテキストの場合のみ、URLをリンクに置換
+          if (!containsHtml) {
+              processedContent = textOrHtml.replace(urlRegex, url => `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">${url}</a>`);
+          }
+          
+          // ★★★★★★★★★ ここまでが変更点 ★★★★★★★★★
+
+          if (sender === 'ai') {
+              messageDiv.innerHTML = `
+                  <div class="flex-shrink-0">
+                      <img src="https://placehold.co/40x40/6366F1/FFFFFF?text=KAI" alt="KAI Avatar" class="rounded-full">
+                  </div>
+                  <div class="bg-indigo-200 text-indigo-900 p-3 rounded-tr-2xl rounded-br-2xl rounded-bl-2xl max-w-[75%] animate-fade-in">
+                      ${processedContent}
+                  </div>
+              `;
+          } else { // sender === 'user'
+              messageDiv.classList.remove('items-start');
+              messageDiv.classList.add('justify-end');
+              messageDiv.innerHTML = `
+                  <div class="bg-green-200 text-green-900 p-3 rounded-tl-2xl rounded-bl-2xl rounded-br-2xl rounded-tr-2xl max-w-[75%] animate-fade-in">
+                      ${processedContent}
+                  </div>
+              `;
+          }
+          chatArea.appendChild(messageDiv);
+          chatArea.scrollTop = chatArea.scrollHeight;
+      }
 
         // Show loading indicator
         function showLoadingIndicator() {
