@@ -1,7 +1,7 @@
 // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 // GAS Web App URL
 // GASをデプロイした際に発行される、新しいウェブアプリのURLをここに貼り付けてください
-const GAS_WEB_APP_URL = 'ここにデプロイしたGASのURLを貼り付け';
+const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxzml5onddDpDyqbh4Aen6F0MC2TykWhgIpQak6mkodmrPU0WpUgcIRmSELrmCylgxM2g/exec';
 // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 
 // --- DOM要素の取得 ---
