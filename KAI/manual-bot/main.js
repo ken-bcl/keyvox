@@ -121,7 +121,6 @@ function generateAndShowQr(data) {
   }, 1000);
 }
 
-// 送信ボタン処理
 function handleSend() {
   const inputEl = document.getElementById("user-input");
   const value = inputEl.value.trim();
@@ -130,15 +129,23 @@ function handleSend() {
   handleUserTextInput(value);
 }
 
-// イベントリスナー
-document.getElementById('send-button').addEventListener('click', handleSend);
+function initializeEventListeners() {
+  const sendBtn = document.getElementById('send-button');
+  const inputEl = document.getElementById("user-input");
 
-// グローバルに使える関数として公開
-window.startWifiSetupFlow = startWifiSetupFlow;
+  if (sendBtn && inputEl) {
+    sendBtn.addEventListener('click', handleSend);
+    inputEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        handleSend();
+      }
+    });
+  }
 
-//
+  // 他にメニューボタン等あれば、ここに同様に追加する
+}
+
 // ✅ Face ID モック演出
-//
 function simulateAppLaunch() {
   const appContainer = document.getElementById('app-container');
   const launchModal = document.getElementById('launch-face-id-modal');
@@ -147,7 +154,6 @@ function simulateAppLaunch() {
   const statusText = document.getElementById('launch-face-id-status');
 
   setTimeout(() => {
-    // 成功演出
     scanIcon.classList.add('hidden');
     successIcon.classList.remove('hidden');
     statusText.textContent = '認証成功';
@@ -160,6 +166,9 @@ function simulateAppLaunch() {
 
       appContainer.classList.remove('hidden');
       appContainer.classList.add('flex');
+
+      // FaceID後にイベントを初期化
+      initializeEventListeners();
     }, 600);
   }, 1800);
 }
@@ -167,3 +176,6 @@ function simulateAppLaunch() {
 window.onload = function () {
   simulateAppLaunch();
 };
+
+// グローバルに公開
+window.startWifiSetupFlow = startWifiSetupFlow;
