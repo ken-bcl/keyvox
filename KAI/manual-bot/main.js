@@ -795,3 +795,4 @@ function onSendClick() {
     console.error("エラー:", error);
   });
 }
+window.onSendClick = onSendClick;
