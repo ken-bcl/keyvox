@@ -1,5 +1,5 @@
 const chatLog = document.getElementById('scrollable-content');
-let currentFlow = null;
+let currentFlow = null; // "wifi_setup"など。nullは通常会話モード。
 
 // メッセージを追加
 function addMessage(sender, text) {
@@ -23,7 +23,7 @@ function sendPromptToServer(prompt) {
   });
 }
 
-// Wi-Fiセットアップ
+// Wi-Fiセットアップフロー
 let wifiSetupContext = {
   active: false,
   step: null,
@@ -121,15 +121,7 @@ function generateAndShowQr(data) {
   }, 1000);
 }
 
-// FaceID認証通過後、UIを表示
-function proceedToChat() {
-  const chatArea = document.getElementById('chat-area');
-  if (chatArea) {
-    chatArea.classList.remove('hidden');
-  }
-}
-
-// 送信処理
+// 送信ボタン処理
 function handleSend() {
   const inputEl = document.getElementById("user-input");
   const value = inputEl.value.trim();
@@ -138,28 +130,40 @@ function handleSend() {
   handleUserTextInput(value);
 }
 
-// イベント登録
-document.addEventListener('DOMContentLoaded', () => {
-  const wifiMenu = document.getElementById('menu-wifi-setup');
-  if (wifiMenu) {
-    wifiMenu.addEventListener('click', () => {
-      addMessage('user', 'Wi-Fi設定を開始');
-      startWifiSetupFlow();
-    });
-  }
+// イベントリスナー
+document.getElementById('send-button').addEventListener('click', handleSend);
 
-  const sendBtn = document.getElementById('send-button');
-  if (sendBtn) {
-    sendBtn.addEventListener('click', handleSend);
-  }
-
-  const faceidBtn = document.getElementById('faceid-button');
-  if (faceidBtn) {
-    faceidBtn.addEventListener('click', () => {
-      addMessage('user', 'Face IDで認証しました');
-      proceedToChat();
-    });
-  }
-});
-
+// グローバルに使える関数として公開
 window.startWifiSetupFlow = startWifiSetupFlow;
+
+//
+// ✅ Face ID モック演出
+//
+function simulateAppLaunch() {
+  const appContainer = document.getElementById('app-container');
+  const launchModal = document.getElementById('launch-face-id-modal');
+  const scanIcon = document.getElementById('launch-face-id-scan-icon');
+  const successIcon = document.getElementById('launch-face-id-success-icon');
+  const statusText = document.getElementById('launch-face-id-status');
+
+  setTimeout(() => {
+    // 成功演出
+    scanIcon.classList.add('hidden');
+    successIcon.classList.remove('hidden');
+    statusText.textContent = '認証成功';
+
+    setTimeout(() => {
+      launchModal.style.opacity = '0';
+      launchModal.addEventListener('transitionend', () => {
+        launchModal.classList.add('hidden');
+      });
+
+      appContainer.classList.remove('hidden');
+      appContainer.classList.add('flex');
+    }, 600);
+  }, 1800);
+}
+
+window.onload = function () {
+  simulateAppLaunch();
+};
