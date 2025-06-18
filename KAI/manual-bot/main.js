@@ -757,5 +757,19 @@ function generateAndShowQr(data) {
 }
 
 
+function displayResponse(text) {
+  const chatContainer = document.getElementById("chat-container");
 
+  // URLをHTMLリンクに変換 + 改行対応
+  const formattedText = text
+    .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="text-blue-600 underline">$1</a>')
+    .replace(/\n/g, "<br>");
+
+  const responseDiv = document.createElement("div");
+  responseDiv.className = "chat-bubble response";
+  responseDiv.innerHTML = formattedText; // ← innerHTMLにするのがポイント！
+
+  chatContainer.appendChild(responseDiv);
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+}
 
