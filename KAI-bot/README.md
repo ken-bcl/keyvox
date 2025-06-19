@@ -25,5 +25,3 @@ npm start
 5. DiscordでBotを呼びかけてChatbase応答を確認！
 
 ---
-
-進める準備ができたら、今すぐ `package.json` から作っていきましょうか？
