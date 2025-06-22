@@ -35,7 +35,7 @@ console.log('Sending to Chatbase:', message.content);
         },
       }
     );
-
+    console.log('Chatbase Response:', res.data); 
     const reply = res.data?.text || 'すみません、うまく返答できませんでした。';
     await message.reply(reply);
   } catch (error) {
