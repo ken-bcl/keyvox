@@ -8,7 +8,7 @@ const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
 const CHATBASE_API_KEY = process.env.CHATBASE_API_KEY;
 const CHATBASE_BOT_ID = process.env.CHATBASE_BOT_ID;
 
-// チャンネル制限用ID
+// KAIに質問するチャンネル専用
 const TARGET_CHANNEL_ID = '1385051535322517525';
 
 const client = new Client({
@@ -22,10 +22,10 @@ const client = new Client({
 const app = express();
 
 client.on('messageCreate', async (message) => {
-  // Bot自身、Webhook、対象外チャンネル、@everyoneは無視
   if (message.author.bot) return;
   if (message.webhookId) return;
   if (message.channel.id !== TARGET_CHANNEL_ID) return;
+  if (!message.content || typeof message.content !== 'string') return;
   if (message.mentions.everyone) return;
 
   console.log('Sending to Chatbase:', message.content);
@@ -36,6 +36,7 @@ client.on('messageCreate', async (message) => {
       {
         messages: [{ role: 'user', content: message.content }],
         chatbotId: CHATBASE_BOT_ID,
+        conversationId: message.author.id, // 💥 これでユーザーごとの会話ログを保存
       },
       {
         headers: {
@@ -47,7 +48,7 @@ client.on('messageCreate', async (message) => {
     const reply = res.data?.text || 'すみません、うまく返答できませんでした。';
     await message.reply(reply);
   } catch (error) {
-    console.error('Chatbase API error:', error);
+    console.error('Chatbase API error:', error.response?.data || error.message);
     await message.reply('エラーが発生しました。');
   }
 });
