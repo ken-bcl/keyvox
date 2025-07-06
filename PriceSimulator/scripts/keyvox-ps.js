@@ -499,18 +499,16 @@ function initializeApp() {
         prevBtn.classList.toggle('hidden', currentStep === 1 || currentStep === 5);
 
         if (currentStep === 5) {
-            nextBtn.classList.remove('hidden');
-            nextBtn.textContent = dictionary[currentLang]['button_go_to_dashboard'];
-            return;
-        }
-
-        nextBtn.className = 'grow-[2] md:grow-0 px-8 py-3 text-white font-semibold rounded-lg btn btn-primary action-btn disabled:opacity-50 disabled:cursor-not-allowed';
-        nextBtn.classList.remove('hidden');
-
-        if (currentStep === 4) {
-            nextBtn.textContent = dict.button_complete_registration;
+            nextBtn.classList.add('hidden');
         } else {
-            nextBtn.textContent = dict.button_next;
+            nextBtn.className = 'grow-[2] md:grow-0 px-8 py-3 text-white font-semibold rounded-lg btn btn-primary action-btn disabled:opacity-50 disabled:cursor-not-allowed';
+            nextBtn.classList.remove('hidden');
+
+            if (currentStep === 4) {
+                nextBtn.textContent = dict.button_complete_registration;
+            } else {
+                nextBtn.textContent = dict.button_next;
+            }
         }
     };
 
