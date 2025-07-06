@@ -81,12 +81,13 @@
                             <span class="flex-1 text-center text-sm font-semibold" data-i18n="apple"></span>
                           </button>
                         </div>
-                            <div class="text-center mt-6">
+                        <div class="text-center mt-6">
                             <span class="text-xs md:text-sm" data-i18n="goToSignupPrompt"></span> 
-                            <a href="#" id="go-to-signup-page" class="link-primary text-sm" data-i18n="goToSignupLink"></a>
+                            <a href="#" id="go-to-signup-page" class="link-primary text-xs md:text-sm" data-i18n="goToSignupLink"></a>
                         </div>
                     </div>
                 </div>
+
                 <!-- Signup View -->
                 <div id="signup-view" class="hidden flex-col h-full mt-0">
                     <div class="flex-grow">
@@ -143,8 +144,9 @@
                           </button>
                         </div>
                         <div class="text-center mt-6">
-                            <span data-i18n="goToLoginPrompt"></span> 
-                            <a href="#" id="go-to-login" class="link-primary text-sm" data-i18n="goToLoginLink"></a>
+                            <!-- ▼▼▼ このspanとaタグのクラスを修正 ▼▼▼ -->
+                            <span class="text-xs md:text-sm" data-i18n="goToLoginPrompt"></span> 
+                            <a href="#" id="go-to-login" class="link-primary text-xs md:text-sm" data-i18n="goToLoginLink"></a>
                         </div>
                     </div>
                 </div>
