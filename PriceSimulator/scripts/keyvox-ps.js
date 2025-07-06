@@ -89,7 +89,6 @@ function initializeApp() {
         window.dictionary = { ja: {}, en: {} };
     }
 
-    // ★★★ FIX: Restore action-btn class for consistent floating effect.
     const verifyNextBtn = document.getElementById('verify-next');
     if (verifyNextBtn) {
         verifyNextBtn.className = 'flex-1 py-3 rounded-lg font-medium text-white action-btn disabled:bg-gray-400 disabled:cursor-not-allowed enabled:bg-gray-800';
@@ -365,36 +364,34 @@ function initializeApp() {
               </div>
             </div>
             <section id="credit-card-section">
-            <h3 class="text-lg font-semibold mb-2" data-i18n="payment_card_info_title"></h3>
-            <div class="space-y-4">
-              <div class="flex space-x-4">
-                <div class="flex-1">
-                  <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="payment_card_name_label"></label>
-                  <input type="text" class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500" data-i18n-placeholder="payment_card_name_placeholder"/>
+                <h3 class="text-lg font-semibold mb-2" data-i18n="payment_card_info_title"></h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="payment_card_name_label"></label>
+                        <input type="text" class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500" data-i18n-placeholder="payment_card_name_placeholder"/>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="payment_card_number_label"></label>
+                        <input type="text" class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500" data-i18n-placeholder="payment_card_number_placeholder"/>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <div class="w-full sm:w-2/3">
+                            <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="payment_card_expiry_label"></label>
+                            <div class="flex space-x-2">
+                                <select class="custom-select block w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500">
+                                <option data-i18n="payment_card_expiry_month"></option>
+                                </select>
+                                <select class="custom-select block w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500">
+                                <option data-i18n="payment_card_expiry_year"></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="w-full sm:w-1/3">
+                            <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="payment_card_cvc_label"></label>
+                            <input type="text" maxlength="4" class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500" data-i18n-placeholder="payment_card_cvc_placeholder"/>
+                        </div>
+                    </div>
                 </div>
-                <div class="w-48">
-                  <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="payment_card_expiry_label"></label>
-                  <div class="flex space-x-2">
-                    <select class="custom-select block w-1/2 px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500">
-                      <option data-i18n="payment_card_expiry_month"></option>
-                    </select>
-                    <select class="custom-select block w-1/2 px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500">
-                      <option data-i18n="payment_card_expiry_year"></option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-              <div class="flex space-x-4 items-start mt-4">
-                <div class="flex-1 space-y-1">
-                  <label class="block text-sm font-medium text-gray-700" data-i18n="payment_card_number_label"></label>
-                  <input type="text" class="w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500" data-i18n-placeholder="payment_card_number_placeholder"/>
-                </div>
-                <div class="w-24 space-y-1">
-                  <label class="block text-sm font-medium text-gray-700" data-i18n="payment_card_cvc_label"></label>
-                  <input type="text" maxlength="4" class="w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500" data-i18n-placeholder="payment_card_cvc_placeholder"/>
-                </div>
-              </div>
-            </div>
             </section>
             <div class="mt-4">
               <div class="bg-gray-50 p-4 rounded-lg w-full max-w-full">
@@ -420,7 +417,7 @@ function initializeApp() {
             <h2 class="text-2xl font-bold text-gray-900 mb-4" data-i18n="complete_title"></h2>
             <p class="text-sm text-gray-700 mb-2" data-i18n="complete_subtitle"></p>
             <p class="text-sm text-gray-700 mb-6" data-i18n="complete_email_notice"></p>
-            <button id="go-to-dashboard-btn" class="mt-8 px-8 py-3 text-white font-semibold rounded-lg shadow-md bg-black hover:bg-gray-700" data-i18n="button_go_to_dashboard"></button>
+            <button id="go-to-dashboard-btn" class="mt-8 px-8 py-3 font-semibold rounded-lg btn btn-primary action-btn" data-i18n="button_go_to_dashboard"></button>
           </div>
         `,
     };
@@ -503,7 +500,7 @@ function initializeApp() {
             item.classList.toggle('completed', index + 1 < currentStep);
         });
 
-        footerTotalContainer.classList.toggle('hidden', ![1, 2, 3].includes(currentStep));
+        footerTotalContainer.classList.toggle('hidden', ![1, 4].includes(currentStep) || (currentStep === 4 && window.isTrialLater));
         prevBtn.classList.toggle('hidden', currentStep === 1 || currentStep === 5);
         
         if (currentStep === 5 || currentStep === 2) {
@@ -511,12 +508,13 @@ function initializeApp() {
              return;
         }
 
-        // ★★★ FIX: Restore action-btn and btn-primary classes for consistent floating effect.
-        nextBtn.className = 'px-8 py-3 text-white font-semibold rounded-lg btn-primary action-btn disabled:opacity-50 disabled:cursor-not-allowed';
+        nextBtn.className = 'grow-[2] md:grow-0 px-8 py-3 text-white font-semibold rounded-lg btn btn-primary action-btn disabled:opacity-50 disabled:cursor-not-allowed';
         nextBtn.classList.remove('hidden');
         
         if (currentStep === 3) {
             nextBtn.textContent = dict.button_send_auth_code;
+        } else if (currentStep === 4) {
+            nextBtn.textContent = dict.button_complete_registration;
         } else {
             nextBtn.textContent = dict.button_next;
         }
@@ -651,19 +649,22 @@ function initializeApp() {
         });
     };
 
-const showOrgModal = () => {
+    const showOrgModal = () => {
         const modal = document.getElementById('org-select-modal');
         if (!modal) return;
         
         const select = document.getElementById('org-select-dropdown');
         const loginBtn = document.getElementById('org-select-login-button');
 
+        // モーダル表示時にボタンを無効化
         loginBtn.disabled = true;
 
+        // プルダウンの選択を監視するイベントリスナー
         const handleSelectChange = () => {
-            loginBtn.disabled = !select.value;
+            loginBtn.disabled = !select.value; // 値が選択されたら有効化
         };
 
+        // 既存のリスナーを削除してから追加（重複防止）
         select.removeEventListener('change', handleSelectChange);
         select.addEventListener('change', handleSelectChange);
         
@@ -905,7 +906,7 @@ function openAIChat() {
         </div>
         <div class="flex">
             <input type="text" placeholder="" data-i18n-placeholder="ai_chat_input_placeholder" class="flex-1 border rounded-l-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400" />
-            <button class="bg-purple-500 text-white px-6 rounded-r-full hover:bg-purple-600 transition"><span data-i1en="ai_chat_send_button">送信</span></button>
+            <button class="bg-purple-500 text-white px-6 rounded-r-full hover:bg-purple-600 transition"><span data-i18n="ai_chat_send_button">送信</span></button>
         </div>
         </div>
     `;

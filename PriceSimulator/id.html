@@ -3,213 +3,198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="title">KEYVOX | ログイン・新規登録</title>
-    <!-- Google Fonts -->
+    <title data-i18n="page_title">Keyvox - ようこそ！最適なプランで始めましょう</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Tailwind CSSを先に読み込む -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
     <link rel="stylesheet" href="styles/style.css">
 </head>
-<body class="bg-slate-50">
+<body class="bg-slate-50 md:min-h-screen md:flex md:items-center md:justify-center md:p-4">
 
-    <div class="flex items-center justify-center min-h-screen py-8">
-        <div class="relative flex w-full max-w-4xl m-4 bg-white shadow-2xl rounded-2xl overflow-hidden">
-            
-            <div class="hidden md:flex w-1/2 flex-col items-center justify-center p-12 text-white gradient-bg text-center">
-                <img src="img/keyvox_1.png" alt="KEYVOX Logo" class="w-56 h-auto mb-4 invert brightness-0" onerror="this.onerror=null;this.src='https://placehold.co/224x70/ffffff/000000?text=KEYVOX';">
-                <h1 class="text-2xl font-bold text-shadow" data-i18n="brandSlogan"></h1>
-            </div>
-
-            <!-- Right Panel (Forms) -->
-            <div class="w-full md:w-1/2 p-8 sm:p-12 form-panel flex flex-col">
-                
-                <!-- Language Switcher -->
-                <div class="absolute top-6 right-6">
-                    <div class="lang-dropdown relative">
-                        <button id="language-toggle" type="button" class="p-2 rounded-full border border-gray-300 bg-white text-gray-500 shadow-sm hover:bg-gray-50 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-blue">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
-                            </svg>
-                        </button>
-                        <div id="language-dropdown" class="lang-dropdown-menu hidden absolute right-0 mt-2 w-40 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none opacity-0 scale-95" role="menu">
-                            <div class="py-1" role="none">
-                                <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem" data-lang="ja" data-i18n="langJa"></a>
-                                <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem" data-lang="en" data-i18n="langEn"></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Login View -->
-                <div id="login-view" class="flex flex-col h-full mt-0">
-                    <div class="flex-grow">
-                        <h1 class="text-3xl font-bold text-center text-gray-800" data-i18n="loginTitle"></h1>
-                        <div class="grid grid-cols-2 gap-2 bg-gray-100 p-1 rounded-lg my-6">
-                            <button id="login-method-phone" class="tab-button w-full p-2 text-sm font-bold text-gray-500 rounded-md transition-all duration-300" data-i18n="loginMethodPhone"></button>
-                            <button id="login-method-account" class="tab-button w-full p-2 text-sm font-bold text-gray-500 rounded-md transition-all duration-300" data-i18n="loginMethodUsername"></button>
-                        </div>
-                        <form id="login-form" class="space-y-4">
-                            <div id="login-field-container" class="input-wrapper"></div>
-                            <div class="input-wrapper">
-                                <label for="login-password" class="block text-sm font-bold text-gray-700 mb-2" data-i18n="passwordLabel"></label>
-                                <input type="password" id="login-password" name="password" class="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:border-primary-blue focus:ring-2 focus:ring-primary-blue/25 transition" required>
-                                <div class="error-message"></div>
-                            </div>
-                            <div class="flex justify-between items-center text-sm pt-2">
-                                <label for="remember-me" class="flex items-center cursor-pointer">
-                                    <input type="checkbox" id="remember-me" class="h-4 w-4 rounded border-gray-300 text-primary-blue focus:ring-primary-blue">
-                                    <span class="ml-2 text-gray-600" data-i18n="rememberMe"></span>
-                                 </label>
-                                <a href="#" id="go-to-forgot-password" class="link-primary" data-i18n="forgotPasswordLink"></a>
-                            </div>
-                             <button type="submit" id="login-submit-button" form="login-form" class="btn btn-primary btn-animated w-full font-bold py-3 rounded-lg mt-4" data-i18n="loginButton"></button>
-                        </form>
-                    </div>
-                    <div class="mt-6">
-                        <div class="separator flex items-center text-center text-gray-400 my-6">
-                            <span class="flex-grow border-t border-gray-200"></span><span class="mx-4 text-xs font-bold" data-i18n="or"></span><span class="flex-grow border-t border-gray-200"></span>
-                        </div>
-                        <div class="flex justify-between gap-4 mt-4 w-full">
-                          <button class="flex-1 flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-full shadow-sm hover:shadow-lg transform hover:-translate-y-1 transition duration-300 bg-white">
-                            <img src="img/google-logo.png" alt="Google" class="w-5 h-5" onerror="this.onerror=null;this.src='https://placehold.co/20x20/ffffff/000000?text=G';">
-                            <span class="flex-1 text-center text-sm font-semibold text-gray-700" data-i18n="google"></span>
-                          </button>
-                          <button class="flex-1 flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-full shadow-sm hover:shadow-lg transform hover:-translate-y-1 transition duration-300 bg-black text-white">
-                            <img src="img/apple-login.png" alt="Apple" class="w-5 h-5" onerror="this.onerror=null;this.src='https://placehold.co/20x20/000000/ffffff?text=A';">
-                            <span class="flex-1 text-center text-sm font-semibold" data-i18n="apple"></span>
-                          </button>
-                        </div>
-                        <div class="text-center mt-6">
-                            <span data-i18n="goToSignupPrompt"></span> 
-                            <a href="#" id="go-to-signup-page" class="link-primary text-sm" data-i18n="goToSignupLink"></a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Signup View -->
-                <div id="signup-view" class="hidden flex-col h-full mt-0">
-                    <div class="flex-grow">
-                        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6" data-i18n="signupTitle"></h1>
-                        <div id="signup-success-message" class="hidden p-3 mb-4 rounded-md bg-green-100 text-green-800 text-center font-bold" data-i18n="signupSuccessMessage"></div>
-                        <form id="signup-form" class="space-y-4">
-                            <div class="input-wrapper">
-                                <label class="block text-sm font-bold text-gray-700 mb-2" data-i18n="phoneLabel"></label>
-                                <div class="flex">
-                                    <select id="signup-phone-country" class="custom-select pl-3 pr-10 py-3 text-base bg-gray-50 border border-r-0 border-gray-300 rounded-l-md focus:outline-none focus:border-primary-blue focus:ring-2 focus:ring-primary-blue/25 transition" required>
-                                        <option data-i18n="countryJapan"></option><option data-i18n="countryUS"></option><option data-i18n="countryUK"></option>
-                                    </select>
-                                <input type="tel" id="signup-phone" name="phone" class="w-full px-4 py-3 text-base border border-gray-300 rounded-r-md focus:border-primary-blue focus:ring-2 focus:ring-primary-blue/25 transition" data-i18n-placeholder="phonePlaceholder" required>
-                                </div>
-                                <div class="error-message"></div>
-                            </div>
-                            <div class="flex items-center justify-center p-2 border border-gray-200 rounded-md bg-gray-50">
-                                <div class="flex items-center space-x-4">
-                                    <input type="checkbox" id="signup-recaptcha" class="h-6 w-6 rounded border-gray-300 text-primary-blue focus:ring-primary-blue" required><span class="text-sm text-gray-700" data-i18n="recaptcha"></span><img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" alt="reCAPTCHA Logo" class="w-8 h-8">
-                                </div>
-                            </div>
-                            <div class="input-wrapper">
-                                <div class="flex gap-2">
-                                    <input type="text" id="signup-verify-code" name="code" class="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:border-primary-blue focus:ring-2 focus:ring-primary-blue/25 transition" data-i18n-placeholder="verifyCodePlaceholder" required>
-                                    <button type="button" id="send-code-signup" class="btn btn-primary btn-animated whitespace-nowrap flex-shrink-0 font-bold py-3 px-4 rounded-lg" data-i18n="sendCodeButton"></button>
-                                </div>
-                                <div class="error-message"></div>
-                            </div>
-                            <div class="input-wrapper">
-                                <label for="signup-password-field" class="block text-sm font-bold text-gray-700 mb-2" data-i18n="signupPasswordLabel"></label>
-                                <input type="password" id="signup-password-field" name="password" class="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:border-primary-blue focus:ring-2 focus:ring-primary-blue/25 transition" data-i18n-placeholder="signupPasswordPlaceholder" required>
-                                <div class="error-message"></div>
-                            </div>
-                            <div class="input-wrapper">
-                                <label for="signup-password-confirm" class="block text-sm font-bold text-gray-700 mb-2" data-i18n="signupPasswordConfirmLabel"></label>
-                                <input type="password" id="signup-password-confirm" name="password_confirm" class="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:border-primary-blue focus:ring-2 focus:ring-primary-blue/25 transition" data-i18n-placeholder="signupPasswordConfirmPlaceholder" required>
-                                <div class="error-message"></div>
-                            </div>
-                            <button type="submit" id="submit-signup" form="signup-form" class="btn btn-primary btn-animated w-full font-bold py-3 rounded-lg" data-i18n="signupButton"></button>
-                        </form>
-                    </div>
-                    <div class="mt-6">
-                        <div class="separator flex items-center text-center text-gray-400 my-6">
-                            <span class="flex-grow border-t border-gray-200"></span><span class="mx-4 text-xs font-bold" data-i18n="or"></span><span class="flex-grow border-t border-gray-200"></span>
-                        </div>
-                        <div class="flex justify-between gap-4 mt-4 w-full">
-                           <button class="flex-1 flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-full shadow-sm hover:shadow-lg transform hover:-translate-y-1 transition duration-300 bg-white">
-                            <img src="img/google-logo.png" alt="Google" class="w-5 h-5" onerror="this.onerror=null;this.src='https://placehold.co/20x20/ffffff/000000?text=G';">
-                            <span class="flex-1 text-center text-sm font-semibold text-gray-700" data-i18n="google"></span>
-                          </button>
-                          <button class="flex-1 flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-full shadow-sm hover:shadow-lg transform hover:-translate-y-1 transition duration-300 bg-black text-white">
-                            <img src="img/apple-login.png" alt="Apple" class="w-5 h-5" onerror="this.onerror=null;this.src='https://placehold.co/20x20/000000/ffffff?text=A';">
-                            <span class="flex-1 text-center text-sm font-semibold" data-i18n="apple"></span>
-                          </button>
-                        </div>
-                        <div class="text-center mt-6">
-                            <span data-i18n="goToLoginPrompt"></span> 
-                            <a href="#" id="go-to-login" class="link-primary text-sm" data-i18n="goToLoginLink"></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Forgot Password Modal -->
-    <div id="forgot-password-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 opacity-0 transition-opacity duration-300">
-        <div class="relative w-full max-w-md bg-white shadow-2xl rounded-2xl p-8 sm:p-10 transform scale-95 transition-transform duration-300">
-            <button id="close-forgot-password-modal" type="button" class="absolute top-4 right-4 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center">
-                <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+    <!-- Language switcher button and dropdown -->
+    <div id="language-switcher" class="fixed top-6 right-6 z-50">
+        <div class="relative">
+            <button id="language-switcher-toggle" type="button" class="p-2 rounded-full border border-gray-300 bg-white text-gray-500 shadow-sm hover:bg-gray-50 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
                 </svg>
-                <span class="sr-only">Close modal</span>
             </button>
-            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6" data-i18n="forgotPasswordTitle"></h2>
-            <div id="reset-success-message" class="hidden p-3 mb-4 rounded-md bg-green-100 text-green-800 text-center font-bold" data-i18n="signupSuccessMessage"></div>
-            <form id="forgot-password-form" class="space-y-4">
-                <div class="input-wrapper">
-                    <label class="block text-sm font-bold text-gray-700 mb-2" data-i18n="phoneLabel"></label>
-                    <div class="flex">
-                        <select id="reset-phone-country" class="custom-select pl-3 pr-10 py-3 text-base bg-gray-50 border border-r-0 border-gray-300 rounded-l-md focus:outline-none focus:border-primary-blue focus:ring-2 focus:ring-primary-blue/25 transition" required>
-                            <option data-i18n="countryJapan"></option><option data-i18n="countryUS"></option><option data-i18n="countryUK"></option>
-                        </select>
-                        <input type="tel" id="reset-phone" name="phone_reset" class="w-full px-4 py-3 text-base border border-gray-300 rounded-r-md focus:border-primary-blue focus:ring-2 focus:ring-primary-blue/25 transition" data-i18n-placeholder="phonePlaceholder" required>
-                    </div>
-                     <div class="error-message"></div>
+            <div id="language-options" class="lang-dropdown hidden absolute right-0 mt-2 w-40 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <div class="py-1" role="none">
+                    <a href="#" id="lang-ja" data-lang="ja" class="text-gray-700 block w-full text-left px-4 py-2 text-sm hover:bg-gray-100" role="menuitem" data-i18n="langJa"></a>
+                    <a href="#" id="lang-en" data-lang="en" class="text-gray-700 block w-full text-left px-4 py-2 text-sm hover:bg-gray-100" role="menuitem" data-i18n="langEn"></a>
                 </div>
-                <div class="flex items-center justify-center p-3 border border-gray-200 rounded-md bg-gray-50">
-                    <div class="flex items-center space-x-4">
-                        <input type="checkbox" id="reset-recaptcha" class="h-6 w-6 rounded border-gray-300 text-primary-blue focus:ring-primary-blue" required><span class="text-sm text-gray-700" data-i18n="recaptcha"></span><img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" alt="reCAPTCHA Logo" class="w-8 h-8">
-                    </div>
-                </div>
-                <div class="input-wrapper">
-                    <div class="flex gap-2">
-                        <input type="text" id="reset-verify-code" name="code_reset" class="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:border-primary-blue focus:ring-2 focus:ring-primary-blue/25 transition" data-i18n-placeholder="verifyCodePlaceholder" required>
-                        <button type="button" id="send-code-reset" class="btn btn-primary btn-animated whitespace-nowrap flex-shrink-0 font-bold py-3 px-4 rounded-lg" data-i18n="sendCodeButton"></button>
-                    </div>
-                    <div class="error-message"></div>
-                </div>
-                <div class="input-wrapper">
-                    <label for="password-reset-field" class="block text-sm font-bold text-gray-700 mb-2" data-i18n="newPasswordLabel"></label>
-                    <input type="password" id="password-reset-field" name="password_reset" class="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:border-primary-blue focus:ring-2 focus:ring-primary-blue/25 transition" data-i18n-placeholder="newPasswordPlaceholder" required>
-                    <div class="error-message"></div>
-                </div>
-                <div class="input-wrapper">
-                    <label for="password-reset-confirm" class="block text-sm font-bold text-gray-700 mb-2" data-i18n="newPasswordConfirmLabel"></label>
-                    <input type="password" id="password-reset-confirm" name="password_reset_confirm" class="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:border-primary-blue focus:ring-2 focus:ring-primary-blue/25 transition" data-i18n-placeholder="signupPasswordConfirmPlaceholder" required>
-                    <div class="error-message"></div>
-                </div>
-                <button type="submit" id="submit-reset-password" class="btn btn-primary btn-animated w-full font-bold py-3 rounded-lg" data-i18n="resetPasswordButton"></button>
-            </form>
+            </div>
         </div>
     </div>
     
-    <!-- Loading Overlay -->
-    <div id="loading-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="loader"></div>
+    <div class="w-full max-w-6xl mx-auto bg-white md:rounded-2xl shadow-xl overflow-hidden md:grid md:grid-cols-2 md:h-[90vh] md:max-h-[800px]">
+
+        <div class="grid grid-rows-[auto_1fr_auto] min-h-screen md:min-h-0 md:h-full relative">
+            <!-- Header with logo and navigation steps -->
+            <header class="px-4 md:px-12 pt-6">
+                <a href="#"><img src="img/keyvox_1.png" alt="KEYVOX Logo" class="h-8"></a>
+                <nav class="mt-6 flex flex-wrap items-center space-x-2 text-sm" aria-label="Signup Steps"></nav>
+            </header>
+
+            <!-- Main content area for step content -->
+            <main class="overflow-y-auto custom-scrollbar px-4 md:px-12 py-6">
+                <div id="step-content"></div>
+            </main>
+
+            <!-- Footer with navigation buttons and total price display -->
+            <footer class="border-t border-slate-200 px-4 md:px-12 py-4">
+                <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+                    <div id="footer-total-container" class="hidden text-center md:text-left">
+                        <p class="text-sm text-slate-700 whitespace-nowrap mb-0" data-i18n="plan_footer_total"></p>
+                        <div id="total-price" class="text-3xl font-extrabold text-sky-500">¥0</div>
+                    </div>
+                    <div class="flex items-center gap-4 w-full md:w-auto md:ml-auto">
+                        <button id="prevBtn" class="grow-[1] md:grow-0 px-5 py-2.5 text-slate-600 font-medium rounded-lg hover:bg-slate-100" data-i18n="button_back"></button>
+                        <button id="nextBtn" class="grow-[2] md:grow-0 px-8 py-3 text-white font-semibold rounded-lg btn btn-primary action-btn"></button>
+                    </div>
+                </div>
+            </footer>
+        </div>
+
+        <!-- Right pane with quotes, features, and trusted logos -->
+        <div class="right-pane p-8 md:p-12 hidden md:flex md:flex-col justify-between h-full overflow-y-auto custom-scrollbar">
+            <div>
+                <div class="mb-12">
+                    <ion-icon name="sparkles" class="text-3xl text-yellow-400"></ion-icon>
+                    <blockquote class="mt-4 text-lg text-slate-700 font-medium" data-i18n="right_pane_quote_text"></blockquote>
+                    <footer class="mt-4">
+                        <p class="font-semibold text-slate-800" data-i18n="right_pane_quote_author"></p>
+                        <p class="text-sm text-slate-600" data-i18n="right_pane_quote_author_title"></p>
+                    </footer>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-slate-800" data-i18n="right_pane_features_title"></h3>
+                    <ul class="mt-4 space-y-4 text-slate-700">
+                        <li class="flex items-start"><ion-icon name="checkmark-circle-outline" class="text-2xl brand-text mr-3 mt-0.5 flex-shrink-0"></ion-icon><span data-i18n="right_pane_feature_1"></span></li>
+                        <li class="flex items-start"><ion-icon name="checkmark-circle-outline" class="text-2xl brand-text mr-3 mt-0.5 flex-shrink-0"></ion-icon><span data-i18n="right_pane_feature_2"></span></li>
+                        <li class="flex items-start"><ion-icon name="checkmark-circle-outline" class="text-2xl brand-text mr-3 mt-0.5 flex-shrink-0"></ion-icon><span data-i18n="right_pane_feature_3"></span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-12">
+                 <p class="text-sm font-semibold text-slate-600 text-center tracking-wider" data-i18n="right_pane_trusted_by"></p>
+                 <div class="mt-4 flex justify-around items-center grayscale opacity-60">
+                   <img src="img/nri.png" alt="NRI Logo" style="height: 26px;">
+                   <img src="img/tis.png" alt="TIS Logo" style="height: 50px;">
+                 </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Verification modal for user confirmation -->
+    <div id="verification-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-8 space-y-6 relative">
+        <button id="verification-close-btn" type="button" class="absolute top-4 right-4 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center">
+          <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+          </svg>
+          <span class="sr-only">Close modal</span>
+        </button>
+        <h2 class="text-xl font-bold text-gray-900 text-center mb-4" data-i18n-html="verify_modal_title"></h2>
+        <div class="flex items-center justify-center p-3 border border-gray-200 rounded-md bg-gray-50 mb-4">
+          <div class="flex items-center space-x-4">
+            <input type="checkbox" id="verification-recaptcha" class="h-6 w-6 rounded border-gray-300 text-sky-500">
+            <span class="text-sm text-gray-700" data-i18n="verify_recaptcha_label"></span>
+            <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" alt="reCAPTCHA Logo" class="w-8 h-8">
+          </div>
+        </div>
+        <div class="grid grid-cols-6 gap-1 sm:gap-2 justify-center">
+          <input type="text" maxlength="1" class="w-full aspect-square text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-lg sm:text-xl" />
+          <input type="text" maxlength="1" class="w-full aspect-square text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-lg sm:text-xl" />
+          <input type="text" maxlength="1" class="w-full aspect-square text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-lg sm:text-xl" />
+          <input type="text" maxlength="1" class="w-full aspect-square text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-lg sm:text-xl" />
+          <input type="text" maxlength="1" class="w-full aspect-square text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-lg sm:text-xl" />
+          <input type="text" maxlength="1" class="w-full aspect-square text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-lg sm:text-xl" />
+        </div>
+        <div class="text-center mt-4">
+          <button id="resend-code-btn" type="button" class="text-sky-500 font-medium hover:underline" data-i18n="verify_modal_resend_link"></button>
+          <div id="resend-success-message" class="hidden p-3 mt-2 rounded-md bg-green-100 text-green-800 text-center font-bold" data-i18n="verify_modal_resend_success">
+          </div>
+        </div>
+        <div class="flex gap-4 mt-6">
+          <button id="back-to-account" type="button" class="flex-1 py-3 bg-gray-100 text-gray-900 rounded-lg font-medium hover:bg-gray-200" data-i18n="verify_modal_back_button"></button>
+          <button id="verify-next" type="button" disabled
+            class="flex-1 py-3 rounded-lg font-medium action-btn
+              text-white
+              disabled:bg-gray-400 disabled:cursor-not-allowed
+              enabled:bg-gray-800 enabled:hover:bg-gray-700 enabled:cursor-pointer"
+            data-i18n="verify_modal_next_button">
+          </button>
+        </div>
+      </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="scripts/i18n.js"></script>
-    <script src="scripts/id.js" defer></script>
+    <!-- Password reset modal (empty content) -->
+    <div id="password-reset-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-8 sm:p-10 space-y-6 relative">
+            </div>
+    </div>
 
+    <!-- Bank transfer instructions and confirmation modal -->
+    <div id="bank-transfer-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-8 space-y-6 relative">
+        <button id="bank-transfer-close" type="button" class="absolute top-4 right-4 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center">
+          <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+          </svg>
+          <span class="sr-only">Close modal</span>
+        </button>
+        <h2 class="text-xl font-bold text-red-600 text-center mb-4" data-i18n="bank_modal_title"></h2>
+        <p class="text-sm text-gray-700" data-i18n="bank_modal_desc"></p>
+        <ul class="list-disc list-inside text-sm text-gray-700 space-y-2">
+          <li data-i18n="bank_modal_rule1"></li>
+          <li data-i18n="bank_modal_rule2"></li>
+        </ul>
+        <p class="text-sm text-gray-900 font-medium" data-i18n="bank_modal_alt_option"></p>
+        <div class="flex gap-4 mt-6">
+            <!-- ▼▼▼ このボタンのクラスを修正 ▼▼▼ -->
+            <button id="bank-transfer-confirm" class="flex-1 py-3 rounded-lg btn btn-primary action-btn" data-i18n="bank_modal_confirm_button"></button>
+            <button id="bank-transfer-cancel" class="flex-1 py-3 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200" data-i18n="bank_modal_cancel_button"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI chat overlay (hidden by default) -->
+    <div id="aiChatOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        </div>
+
+    <!-- Organization selection modal -->
+    <div id="org-select-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-8 space-y-6 relative">
+        <button id="org-select-close-btn" type="button" onclick="closeOrgModal()" class="absolute top-4 right-4 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center">
+          <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+          </svg>
+          <span class="sr-only">Close modal</span>
+        </button>
+        <h2 class="text-xl font-bold text-gray-800 text-center mb-4" data-i18n="org_select_title"></h2>
+        <select id="org-select-dropdown" class="custom-select block w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500">
+          <option value="" data-i18n="org_select_placeholder"></option>
+          <option value="org1" data-i18n="org_select_option_a"></option>
+          <option value="org2" data-i18n="org_select_option_b"></option>
+          <option value="org3" data-i18n="org_select_option_c"></option>
+        </select>
+        <div id="org-select-error" class="hidden p-3 mb-4 rounded-md bg-pink-100 text-pink-700 text-center font-bold" data-i18n="org_select_error"></div>
+        <div class="flex gap-4 mt-6">
+          <button onclick="closeOrgModal()" class="flex-1 py-3 rounded-lg font-medium btn btn-secondary" data-i18n="org_select_cancel_button"></button>
+          <button id="org-select-login-button" onclick="confirmOrgSelection()" class="flex-1 py-3 rounded-lg font-medium btn btn-primary action-btn" data-i18n="org_select_login_button"></button>
+        </div>
+      </div>
+    </div>
+    
+    <script src="scripts/i18n.js"></script>
+    <script src="scripts/keyvox-ps.js" defer></script>
 </body>
 </html>
