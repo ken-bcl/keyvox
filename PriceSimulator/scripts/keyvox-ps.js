@@ -8,9 +8,7 @@
 let currentLang = localStorage.getItem('lang')
     || ((navigator.language || navigator.userLanguage).startsWith('en') ? 'en' : 'ja');
 window.isTrialLater = false;
-window.skipVerificationModal = false;
 let lastTotal = 0;
-let validateSignupForm; // Will be defined inside initializeApp
 let updateNavigationUI = () => {}; // Globally scoped placeholder
 
 // --- Language Switcher Active State Handling ---
@@ -409,8 +407,7 @@ function initializeApp() {
             <h2 class="text-2xl font-bold text-gray-900 mb-4" data-i18n="complete_title"></h2>
             <p class="text-sm text-gray-700 mb-2" data-i18n="complete_subtitle"></p>
             <p class="text-sm text-gray-700 mb-6" data-i18n="complete_email_notice"></p>
-            <!-- ▼▼▼ このボタンのクラスを修正 ▼▼▼ -->
-            <button id="go-to-dashboard-btn" class="mt-8 px-8 py-3 text-white font-semibold rounded-lg btn btn-primary action-btn" data-i18n="button_go_to_dashboard"></button>
+            <button id="go-to-dashboard-btn" class="mt-8 px-8 py-3 btn btn-primary action-btn rounded-lg" data-i18n="button_go_to_dashboard"></button>
           </div>
         `,
     };
@@ -493,18 +490,23 @@ function initializeApp() {
             item.classList.toggle('completed', index + 1 < currentStep);
         });
 
-        footerTotalContainer.classList.toggle('hidden', ![1, 4].includes(currentStep) || (currentStep === 4 && window.isTrialLater));
+        const isFooterHidden = currentStep === 5;
+        footerTotalContainer.classList.toggle('hidden', isFooterHidden);
+        if (!isFooterHidden && document.getElementById('total-price')) {
+            document.getElementById('total-price').textContent = `¥${lastTotal.toLocaleString()}`;
+        }
+
         prevBtn.classList.toggle('hidden', currentStep === 1 || currentStep === 5);
-        
-        if (currentStep === 5 || currentStep === 2) {
-             nextBtn.classList.add('hidden');
-             return;
+
+        if (currentStep === 5) {
+            nextBtn.classList.remove('hidden');
+            nextBtn.textContent = dictionary[currentLang]['button_go_to_dashboard'];
+            return;
         }
 
         nextBtn.className = 'grow-[2] md:grow-0 px-8 py-3 text-white font-semibold rounded-lg btn btn-primary action-btn disabled:opacity-50 disabled:cursor-not-allowed';
         nextBtn.classList.remove('hidden');
-        
-        // ▼▼▼ ボタンテキストのロジックを修正 ▼▼▼
+
         if (currentStep === 4) {
             nextBtn.textContent = dict.button_complete_registration;
         } else {
@@ -575,7 +577,13 @@ function initializeApp() {
             quantityInput.dispatchEvent(new Event('change'));
             updateAndCalculate();
         });
-        container.querySelector('#trial-later-link').addEventListener('click', (e) => { e.preventDefault(); window.isTrialLater = true; currentStep = 4; updateUI(); });
+        container.querySelector('#trial-later-link').addEventListener('click', (e) => { 
+            e.preventDefault(); 
+            window.isTrialLater = true; 
+            lastTotal = 0;
+            currentStep = 4; 
+            updateUI(); 
+        });
         
         updateAndCalculate();
     };
@@ -775,13 +783,14 @@ function initializeApp() {
         const yySelect = document.getElementById('card-expiry-year');
         const cardNumberInput = paymentStep.querySelector('input[data-i18n-placeholder="payment_card_number_placeholder"]');
 
+        const dict = window.dictionary[currentLang];
         if(mmSelect) {
-            mmSelect.innerHTML = `<option value="" data-i18n="payment_card_expiry_month"></option>` + 
+            mmSelect.innerHTML = `<option value="">${dict.payment_card_expiry_month || 'MM'}</option>` + 
                 Array.from({length: 12}, (_, i) => `<option value="${i+1}">${(i+1).toString().padStart(2, '0')}</option>`).join('');
         }
         if(yySelect) {
             const nowYear = new Date().getFullYear();
-            yySelect.innerHTML = `<option value="" data-i18n="payment_card_expiry_year"></option>` + 
+            yySelect.innerHTML = `<option value="">${dict.payment_card_expiry_year || 'YYYY'}</option>` + 
                 Array.from({length: 10}, (_, i) => `<option value="${nowYear + i}">${nowYear + i}</option>`).join('');
         }
         
@@ -832,6 +841,9 @@ function initializeApp() {
         if (currentStep < totalSteps) {
             currentStep++;
             updateUI();
+        } else if (currentStep === totalSteps) {
+            // Add your completion action here, for example:
+            window.location.href = 'https://eco.blockchainlock.io/bacs-web/index.html#/user/login';
         }
     });
 
