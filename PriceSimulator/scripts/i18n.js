@@ -164,7 +164,7 @@ const i18n = {
     en: 'Login',
   },
   'subTagline': {
-    ja: 'その扉の向こうへ',
+    ja: 'そのカギが未来への扉を開く',
     en: 'Beyond the door',
   },
   'copyright': {
