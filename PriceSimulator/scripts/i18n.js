@@ -232,11 +232,11 @@ const i18n = {
     en: '“Real-time data enables detailed operations and improvements. We can no longer imagine operating without KEYVOX.”',
   },
   'right_pane_quote_author': {
-    ja: '鍵屋様',
+    ja: '田中様',
     en: 'Mr. Kagiya',
   },
   'right_pane_quote_author_title': {
-    ja: '株式会社スマートフィットネス 代表取締役社長',
+    ja: '株式会社ブルーマウンテンフィットネス 代表取締役社長',
     en: 'CEO, Smart Fitness Inc.',
   },
   'right_pane_features_title': {
@@ -256,7 +256,7 @@ const i18n = {
     en: 'Ideal for big data management with real-time history integration: Contributes to operational optimization and service improvement.',
   },
   'right_pane_trusted_by': {
-    ja: 'TRUSTED BY TEAMS AT',
+    ja: '株主兼主要事業パートナー',
     en: 'TRUSTED BY TEAMS AT',
   },
   'button_back': {

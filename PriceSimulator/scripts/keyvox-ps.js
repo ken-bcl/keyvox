@@ -1,7 +1,7 @@
 /* ==========================================
    keyvox-ps.js – JS for Price Simulator
    Author: Ken Okamoto
-   Last updated: 2025-07-06
+   Last updated: 2025-07-07
    ========================================== */
 
 // --- i18n & Global State ---
@@ -88,12 +88,6 @@ function initializeApp() {
         console.error('Dictionary (i18n) not found. Make sure dic-ps.js is loaded BEFORE keyvox-ps.js.');
         window.dictionary = { ja: {}, en: {} };
     }
-
-    const verifyNextBtn = document.getElementById('verify-next');
-    if (verifyNextBtn) {
-        verifyNextBtn.className = 'flex-1 py-3 rounded-lg font-medium text-white action-btn disabled:bg-gray-400 disabled:cursor-not-allowed enabled:bg-gray-800';
-    }
-
 
     const langSwitcher = document.getElementById('language-switcher');
     const langToggle = document.getElementById('language-switcher-toggle');
@@ -378,11 +372,9 @@ function initializeApp() {
                         <div class="w-full sm:w-2/3">
                             <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="payment_card_expiry_label"></label>
                             <div class="flex space-x-2">
-                                <select class="custom-select block w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500">
-                                <option data-i18n="payment_card_expiry_month"></option>
+                                <select id="card-expiry-month" class="custom-select block w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500">
                                 </select>
-                                <select class="custom-select block w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500">
-                                <option data-i18n="payment_card_expiry_year"></option>
+                                <select id="card-expiry-year" class="custom-select block w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500">
                                 </select>
                             </div>
                         </div>
@@ -417,7 +409,8 @@ function initializeApp() {
             <h2 class="text-2xl font-bold text-gray-900 mb-4" data-i18n="complete_title"></h2>
             <p class="text-sm text-gray-700 mb-2" data-i18n="complete_subtitle"></p>
             <p class="text-sm text-gray-700 mb-6" data-i18n="complete_email_notice"></p>
-            <button id="go-to-dashboard-btn" class="mt-8 px-8 py-3 font-semibold rounded-lg btn btn-primary action-btn" data-i18n="button_go_to_dashboard"></button>
+            <!-- ▼▼▼ このボタンのクラスを修正 ▼▼▼ -->
+            <button id="go-to-dashboard-btn" class="mt-8 px-8 py-3 text-white font-semibold rounded-lg btn btn-primary action-btn" data-i18n="button_go_to_dashboard"></button>
           </div>
         `,
     };
@@ -511,9 +504,8 @@ function initializeApp() {
         nextBtn.className = 'grow-[2] md:grow-0 px-8 py-3 text-white font-semibold rounded-lg btn btn-primary action-btn disabled:opacity-50 disabled:cursor-not-allowed';
         nextBtn.classList.remove('hidden');
         
-        if (currentStep === 3) {
-            nextBtn.textContent = dict.button_send_auth_code;
-        } else if (currentStep === 4) {
+        // ▼▼▼ ボタンテキストのロジックを修正 ▼▼▼
+        if (currentStep === 4) {
             nextBtn.textContent = dict.button_complete_registration;
         } else {
             nextBtn.textContent = dict.button_next;
@@ -779,8 +771,9 @@ function initializeApp() {
         });
 
         const paymentStep = document.getElementById('payment-step');
-        const mmSelect = paymentStep.querySelector('select[data-i18n="payment_card_expiry_month"]');
-        const yySelect = paymentStep.querySelector('select[data-i18n="payment_card_expiry_year"]');
+        const mmSelect = document.getElementById('card-expiry-month');
+        const yySelect = document.getElementById('card-expiry-year');
+        const cardNumberInput = paymentStep.querySelector('input[data-i18n-placeholder="payment_card_number_placeholder"]');
 
         if(mmSelect) {
             mmSelect.innerHTML = `<option value="" data-i18n="payment_card_expiry_month"></option>` + 
@@ -792,24 +785,29 @@ function initializeApp() {
                 Array.from({length: 10}, (_, i) => `<option value="${nowYear + i}">${nowYear + i}</option>`).join('');
         }
         
-        const cardNumberInput = paymentStep.querySelector('input[data-i18n-placeholder="payment_card_number_placeholder"]');
-        const cvcInput = paymentStep.querySelector('input[data-i18n-placeholder="payment_card_cvc_placeholder"]');
-
         if (cardNumberInput) {
             cardNumberInput.setAttribute('maxlength', '19');
             cardNumberInput.addEventListener('input', (e) => {
                 let value = e.target.value.replace(/\D/g, '').substring(0, 16);
                 e.target.value = value.match(/.{1,4}/g)?.join(' ') || '';
-                if (value.length === 16) cvcInput?.focus();
             });
         }
 
         const cardInputsAll = paymentStep.querySelectorAll('#credit-card-section input, #credit-card-section select');
         const validatePaymentForm = () => {
-            if (checkbox.checked) return;
+            if (checkbox.checked) {
+                submitButton.disabled = false;
+                return;
+            }
+            
             const allFilled = Array.from(cardInputsAll).every(input => input.value.trim() !== '');
-            submitButton.disabled = !allFilled;
+            
+            const cardNumberValue = cardNumberInput.value.replace(/\s/g, '');
+            const isCardNumberValid = cardNumberValue.length === 16;
+
+            submitButton.disabled = !(allFilled && isCardNumberValid);
         };
+        
         cardInputsAll.forEach(input => input.addEventListener('input', validatePaymentForm));
         validatePaymentForm();
     };
@@ -831,12 +829,6 @@ function initializeApp() {
     };
     
     nextBtn.addEventListener('click', () => {
-        if (currentStep === 3 && !window.skipVerificationModal) {
-            document.getElementById('verification-modal').classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-            return;
-        }
-        window.skipVerificationModal = false;
         if (currentStep < totalSteps) {
             currentStep++;
             updateUI();
@@ -851,40 +843,6 @@ function initializeApp() {
         } 
     });
     
-    const verificationModal = document.getElementById('verification-modal');
-    verificationModal.addEventListener('click', (e) => {
-        if (e.target.closest('#verification-close-btn') || e.target.id === 'back-to-account') {
-            verificationModal.classList.add('hidden');
-            document.body.style.overflow = '';
-        } else if (e.target.id === 'verify-next' && !e.target.disabled) {
-            verificationModal.classList.add('hidden');
-            document.body.style.overflow = '';
-            window.skipVerificationModal = true;
-            nextBtn.click();
-        }
-    });
-    const codeInputs = [...verificationModal.querySelectorAll('input[type="text"]')];
-    verificationModal.addEventListener('input', (e) => {
-        const target = e.target;
-        const targetIndex = codeInputs.indexOf(target);
-        if (targetIndex > -1) {
-            if (target.value.length === 1 && targetIndex < codeInputs.length - 1) {
-                codeInputs[targetIndex + 1].focus();
-            } else if (target.value.length === 0 && targetIndex > 0) {
-                codeInputs[targetIndex - 1].focus();
-            }
-            const allFilled = codeInputs.every(i => i.value.trim().length === 1);
-            verificationModal.querySelector('#verify-next').disabled = !allFilled;
-        }
-    });
-    document.getElementById('resend-code-btn')?.addEventListener('click', function () {
-        const msg = document.getElementById('resend-success-message');
-        if (msg) {
-            msg.classList.remove('hidden');
-            setTimeout(() => msg.classList.add('hidden'), 4000);
-        }
-    });
-
     updateUI();
     handleHashNavigation();
 }

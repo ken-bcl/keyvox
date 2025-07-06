@@ -125,13 +125,8 @@
         </div>
         <div class="flex gap-4 mt-6">
           <button id="back-to-account" type="button" class="flex-1 py-3 bg-gray-100 text-gray-900 rounded-lg font-medium hover:bg-gray-200" data-i18n="verify_modal_back_button"></button>
-          <button id="verify-next" type="button" disabled
-            class="flex-1 py-3 rounded-lg font-medium action-btn
-              text-white
-              disabled:bg-gray-400 disabled:cursor-not-allowed
-              enabled:bg-gray-800 enabled:hover:bg-gray-700 enabled:cursor-pointer"
-            data-i18n="verify_modal_next_button">
-          </button>
+          <!-- ▼▼▼ このボタンのクラスを修正 ▼▼▼ -->
+          <button id="verify-next" type="button" disabled class="flex-1 py-3 rounded-lg font-medium btn btn-primary action-btn disabled:bg-gray-400 disabled:cursor-not-allowed" data-i18n="verify_modal_next_button"></button>
         </div>
       </div>
     </div>
