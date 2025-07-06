@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="title">KEYVOX | ログイン・新規登録</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSSを先に読み込む -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+<body class="bg-slate-50">
+
+    <div class="flex items-center justify-center min-h-screen py-8">
+        <div class="relative flex w-full max-w-4xl m-4 bg-white shadow-2xl rounded-2xl overflow-hidden">
+            
+            <div class="hidden md:flex w-1/2 flex-col items-center justify-center p-12 text-white gradient-bg text-center">
+                <img src="img/keyvox_1.png" alt="KEYVOX Logo" class="w-56 h-auto mb-4 invert brightness-0" onerror="this.onerror=null;this.src='https://placehold.co/224x70/ffffff/000000?text=KEYVOX';">
+                <h1 class="text-2xl font-bold text-shadow" data-i18n="brandSlogan"></h1>
+            </div>
+
+            <!-- Right Panel (Forms) -->
+            <div class="w-full md:w-1/2 p-8 sm:p-12 form-panel flex flex-col">
+                
+                <!-- Language Switcher -->
+                <div class="absolute top-6 right-6">
+                    <div class="lang-dropdown relative">
+                        <button id="language-toggle" type="button" class="p-2 rounded-full border border-gray-300 bg-white text-gray-500 shadow-sm hover:bg-gray-50 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-blue">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+                            </svg>
+                        </button>
+                        <div id="language-dropdown" class="lang-dropdown-menu hidden absolute right-0 mt-2 w-40 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none opacity-0 scale-95" role="menu">
+                            <div class="py-1" role="none">
+                                <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem" data-lang="ja" data-i18n="langJa"></a>
+                                <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem" data-lang="en" data-i18n="langEn"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Login View -->
+                <div id="login-view" class="flex flex-col h-full mt-0">
+                    <div class="flex-grow">
+                        <h1 class="text-3xl font-bold text-center text-gray-800" data-i18n="loginTitle"></h1>
+                        <div class="grid grid-cols-2 gap-2 bg-gray-100 p-1 rounded-lg my-6">
+                            <button id="login-method-phone" class="tab-button w-full p-2 text-sm font-bold text-gray-500 rounded-md transition-all duration-300" data-i18n="loginMethodPhone"></button>
+                            <button id="login-method-account" class="tab-button w-full p-2 text-sm font-bold text-gray-500 rounded-md transition-all duration-300" data-i18n="loginMethodUsername"></button>
+                        </div>
+                        <form id="login-form" class="space-y-4">
+                            <div id="login-field-container" class="input-wrapper"></div>
+                            <div class="input-wrapper">
+                                <label for="login-password" class="block text-sm font-bold text-gray-700 mb-2" data-i18n="passwordLabel"></label>
+                                <input type="password" id="login-password" name="password" class="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:border-primary-blue focus:ring-2 focus:ring-primary-blue/25 transition" required>
+                                <div class="error-message"></div>
+                            </div>
+                            <div class="flex justify-between items-center text-sm pt-2">
+                                <label for="remember-me" class="flex items-center cursor-pointer">
+                                    <input type="checkbox" id="remember-me" class="h-4 w-4 rounded border-gray-300 text-primary-blue focus:ring-primary-blue">
+                                    <span class="ml-2 text-gray-600" data-i18n="rememberMe"></span>
+                                 </label>
+                                <a href="#" id="go-to-forgot-password" class="link-primary" data-i18n="forgotPasswordLink"></a>
+                            </div>
+                             <button type="submit" id="login-submit-button" form="login-form" class="btn btn-primary btn-animated w-full font-bold py-3 rounded-lg mt-4" data-i18n="loginButton"></button>
+                        </form>
+                    </div>
+                    <div class="mt-6">
+                        <div class="separator flex items-center text-center text-gray-400 my-6">
+                            <span class="flex-grow border-t border-gray-200"></span><span class="mx-4 text-xs font-bold" data-i18n="or"></span><span class="flex-grow border-t border-gray-200"></span>
+                        </div>
+                        <div class="flex justify-between gap-4 mt-4 w-full">
+                          <button class="flex-1 flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-full shadow-sm hover:shadow-lg transform hover:-translate-y-1 transition duration-300 bg-white">
+                            <img src="img/google-logo.png" alt="Google" class="w-5 h-5" onerror="this.onerror=null;this.src='https://placehold.co/20x20/ffffff/000000?text=G';">
+                            <span class="flex-1 text-center text-sm font-semibold text-gray-700" data-i18n="google"></span>
+                          </button>
+                          <button class="flex-1 flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-full shadow-sm hover:shadow-lg transform hover:-translate-y-1 transition duration-300 bg-black text-white">
+                            <img src="img/apple-login.png" alt="Apple" class="w-5 h-5" onerror="this.onerror=null;this.src='https://placehold.co/20x20/000000/ffffff?text=A';">
+                            <span class="flex-1 text-center text-sm font-semibold" data-i18n="apple"></span>
+                          </button>
+                        </div>
+                        <div class="text-center mt-6">
+                            <span data-i18n="goToSignupPrompt"></span> 
+                            <a href="#" id="go-to-signup-page" class="link-primary text-sm" data-i18n="goToSignupLink"></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Signup View -->
+                <div id="signup-view" class="hidden flex-col h-full mt-0">
+                    <div class="flex-grow">
+                        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6" data-i18n="signupTitle"></h1>
+                        <div id="signup-success-message" class="hidden p-3 mb-4 rounded-md bg-green-100 text-green-800 text-center font-bold" data-i18n="signupSuccessMessage"></div>
+                        <form id="signup-form" class="space-y-4">
+                            <div class="input-wrapper">
+                                <label class="block text-sm font-bold text-gray-700 mb-2" data-i18n="phoneLabel"></label>
+                                <div class="flex">
+                                    <select id="signup-phone-country" class="custom-select pl-3 pr-10 py-3 text-base bg-gray-50 border border-r-0 border-gray-300 rounded-l-md focus:outline-none focus:border-primary-blue focus:ring-2 focus:ring-primary-blue/25 transition" required>
+                                        <option data-i18n="countryJapan"></option><option data-i18n="countryUS"></option><option data-i18n="countryUK"></option>
+                                    </select>
+                                <input type="tel" id="signup-phone" name="phone" class="w-full px-4 py-3 text-base border border-gray-300 rounded-r-md focus:border-primary-blue focus:ring-2 focus:ring-primary-blue/25 transition" data-i18n-placeholder="phonePlaceholder" required>
+                                </div>
+                                <div class="error-message"></div>
+                            </div>
+                            <div class="flex items-center justify-center p-2 border border-gray-200 rounded-md bg-gray-50">
+                                <div class="flex items-center space-x-4">
+                                    <input type="checkbox" id="signup-recaptcha" class="h-6 w-6 rounded border-gray-300 text-primary-blue focus:ring-primary-blue" required><span class="text-sm text-gray-700" data-i18n="recaptcha"></span><img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" alt="reCAPTCHA Logo" class="w-8 h-8">
+                                </div>
+                            </div>
+                            <div class="input-wrapper">
+                                <div class="flex gap-2">
+                                    <input type="text" id="signup-verify-code" name="code" class="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:border-primary-blue focus:ring-2 focus:ring-primary-blue/25 transition" data-i18n-placeholder="verifyCodePlaceholder" required>
+                                    <button type="button" id="send-code-signup" class="btn btn-primary btn-animated whitespace-nowrap flex-shrink-0 font-bold py-3 px-4 rounded-lg" data-i18n="sendCodeButton"></button>
+                                </div>
+                                <div class="error-message"></div>
+                            </div>
+                            <div class="input-wrapper">
+                                <label for="signup-password-field" class="block text-sm font-bold text-gray-700 mb-2" data-i18n="signupPasswordLabel"></label>
+                                <input type="password" id="signup-password-field" name="password" class="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:border-primary-blue focus:ring-2 focus:ring-primary-blue/25 transition" data-i18n-placeholder="signupPasswordPlaceholder" required>
+                                <div class="error-message"></div>
+                            </div>
+                            <div class="input-wrapper">
+                                <label for="signup-password-confirm" class="block text-sm font-bold text-gray-700 mb-2" data-i18n="signupPasswordConfirmLabel"></label>
+                                <input type="password" id="signup-password-confirm" name="password_confirm" class="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:border-primary-blue focus:ring-2 focus:ring-primary-blue/25 transition" data-i18n-placeholder="signupPasswordConfirmPlaceholder" required>
+                                <div class="error-message"></div>
+                            </div>
+                            <button type="submit" id="submit-signup" form="signup-form" class="btn btn-primary btn-animated w-full font-bold py-3 rounded-lg" data-i18n="signupButton"></button>
+                        </form>
+                    </div>
+                    <div class="mt-6">
+                        <div class="separator flex items-center text-center text-gray-400 my-6">
+                            <span class="flex-grow border-t border-gray-200"></span><span class="mx-4 text-xs font-bold" data-i18n="or"></span><span class="flex-grow border-t border-gray-200"></span>
+                        </div>
+                        <div class="flex justify-between gap-4 mt-4 w-full">
+                           <button class="flex-1 flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-full shadow-sm hover:shadow-lg transform hover:-translate-y-1 transition duration-300 bg-white">
+                            <img src="img/google-logo.png" alt="Google" class="w-5 h-5" onerror="this.onerror=null;this.src='https://placehold.co/20x20/ffffff/000000?text=G';">
+                            <span class="flex-1 text-center text-sm font-semibold text-gray-700" data-i18n="google"></span>
+                          </button>
+                          <button class="flex-1 flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-full shadow-sm hover:shadow-lg transform hover:-translate-y-1 transition duration-300 bg-black text-white">
+                            <img src="img/apple-login.png" alt="Apple" class="w-5 h-5" onerror="this.onerror=null;this.src='https://placehold.co/20x20/000000/ffffff?text=A';">
+                            <span class="flex-1 text-center text-sm font-semibold" data-i18n="apple"></span>
+                          </button>
+                        </div>
+                        <div class="text-center mt-6">
+                            <span data-i18n="goToLoginPrompt"></span> 
+                            <a href="#" id="go-to-login" class="link-primary text-sm" data-i18n="goToLoginLink"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div id="forgot-password-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 opacity-0 transition-opacity duration-300">
+        <div class="relative w-full max-w-md bg-white shadow-2xl rounded-2xl p-8 sm:p-10 transform scale-95 transition-transform duration-300">
+            <button id="close-forgot-password-modal" type="button" class="absolute top-4 right-4 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center">
+                <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                </svg>
+                <span class="sr-only">Close modal</span>
+            </button>
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6" data-i18n="forgotPasswordTitle"></h2>
+            <div id="reset-success-message" class="hidden p-3 mb-4 rounded-md bg-green-100 text-green-800 text-center font-bold" data-i18n="signupSuccessMessage"></div>
+            <form id="forgot-password-form" class="space-y-4">
+                <div class="input-wrapper">
+                    <label class="block text-sm font-bold text-gray-700 mb-2" data-i18n="phoneLabel"></label>
+                    <div class="flex">
+                        <select id="reset-phone-country" class="custom-select pl-3 pr-10 py-3 text-base bg-gray-50 border border-r-0 border-gray-300 rounded-l-md focus:outline-none focus:border-primary-blue focus:ring-2 focus:ring-primary-blue/25 transition" required>
+                            <option data-i18n="countryJapan"></option><option data-i18n="countryUS"></option><option data-i18n="countryUK"></option>
+                        </select>
+                        <input type="tel" id="reset-phone" name="phone_reset" class="w-full px-4 py-3 text-base border border-gray-300 rounded-r-md focus:border-primary-blue focus:ring-2 focus:ring-primary-blue/25 transition" data-i18n-placeholder="phonePlaceholder" required>
+                    </div>
+                     <div class="error-message"></div>
+                </div>
+                <div class="flex items-center justify-center p-3 border border-gray-200 rounded-md bg-gray-50">
+                    <div class="flex items-center space-x-4">
+                        <input type="checkbox" id="reset-recaptcha" class="h-6 w-6 rounded border-gray-300 text-primary-blue focus:ring-primary-blue" required><span class="text-sm text-gray-700" data-i18n="recaptcha"></span><img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" alt="reCAPTCHA Logo" class="w-8 h-8">
+                    </div>
+                </div>
+                <div class="input-wrapper">
+                    <div class="flex gap-2">
+                        <input type="text" id="reset-verify-code" name="code_reset" class="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:border-primary-blue focus:ring-2 focus:ring-primary-blue/25 transition" data-i18n-placeholder="verifyCodePlaceholder" required>
+                        <button type="button" id="send-code-reset" class="btn btn-primary btn-animated whitespace-nowrap flex-shrink-0 font-bold py-3 px-4 rounded-lg" data-i18n="sendCodeButton"></button>
+                    </div>
+                    <div class="error-message"></div>
+                </div>
+                <div class="input-wrapper">
+                    <label for="password-reset-field" class="block text-sm font-bold text-gray-700 mb-2" data-i18n="newPasswordLabel"></label>
+                    <input type="password" id="password-reset-field" name="password_reset" class="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:border-primary-blue focus:ring-2 focus:ring-primary-blue/25 transition" data-i18n-placeholder="newPasswordPlaceholder" required>
+                    <div class="error-message"></div>
+                </div>
+                <div class="input-wrapper">
+                    <label for="password-reset-confirm" class="block text-sm font-bold text-gray-700 mb-2" data-i18n="newPasswordConfirmLabel"></label>
+                    <input type="password" id="password-reset-confirm" name="password_reset_confirm" class="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:border-primary-blue focus:ring-2 focus:ring-primary-blue/25 transition" data-i18n-placeholder="signupPasswordConfirmPlaceholder" required>
+                    <div class="error-message"></div>
+                </div>
+                <button type="submit" id="submit-reset-password" class="btn btn-primary btn-animated w-full font-bold py-3 rounded-lg" data-i18n="resetPasswordButton"></button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="scripts/i18n.js"></script>
+    <script src="scripts/id.js" defer></script>
+
+</body>
+</html>

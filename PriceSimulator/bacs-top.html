@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="KEYVOX | Universal Access Control System"></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- ▼ 参照先を styles/style.css に修正 -->
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+<body class="gradient-bg text-white">
+
+    <div class="relative flex flex-col items-center justify-center min-h-screen p-8">
+        
+        <div class="absolute top-6 right-6 flex items-center">
+            <div class="text-sm mr-4">
+                <a href="https://keyvox.co" target="_blank" class="text-white hover:underline" data-i18n="keyvoxSite" data-i18n-href="keyvoxSiteHref"></a>
+                <a href="https://keyvox.co/support" target="_blank" class="text-white hover:underline ml-4" data-i18n="support" data-i18n-href="supportHref"></a>
+            </div>
+            <!-- ▼ 言語スイッチャーの構造を統一 -->
+            <div class="lang-dropdown relative">
+                <button id="language-toggle" type="button" class="p-2 rounded-full bg-white/20 text-white shadow-sm hover:bg-white/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-transparent focus:ring-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                       <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+                    </svg>
+                </button>
+                <div id="language-dropdown" class="lang-dropdown-menu hidden absolute right-0 mt-2 w-40 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none opacity-0 scale-95" role="menu">
+                    <div class="py-1" role="none">
+                        <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem" data-lang="ja" data-i18n="langJa"></a>
+                        <a href="#" class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem" data-lang="en" data-i18n="langEn"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <main class="text-center">
+            <div class="mb-8">
+                <img src="img/keyvox_1.png" alt="KEYVOX Logo" class="w-56 h-auto mx-auto invert brightness-0" onerror="this.onerror=null;this.src='https://placehold.co/224x70/ffffff/000000?text=KEYVOX';">
+            </div>
+
+            <h1 class="text-4xl md:text-5xl font-bold text-shadow mb-4" data-i18n="brandSlogan"></h1>
+            <p class="text-lg text-white/80 mb-12" data-i18n="subTagline"></p>
+
+            <a href="id.html" class="action-btn inline-block bg-white text-gray-800 font-bold text-lg py-4 px-12 rounded-lg shadow-lg" data-i18n="loginButton"></a>
+            
+            <div class="mt-8 text-center">
+                <p class="text-sm text-white/80">
+                    <span data-i18n="noAccount"></span>
+                    <a href="keyvox-ps.html" target="_blank" class="font-bold underline hover:text-white" data-i18n="signUpLink"></a>
+                </p>
+            </div>
+        </main>
+
+        <footer class="absolute bottom-6 text-center w-full">
+            <p class="text-sm text-white/70" data-i18n="copyright"></p>
+        </footer>
+    </div>
+
+    <div id="autherror-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50">
+        <div class="modal-content relative bg-white rounded-lg shadow-xl w-full max-w-lg mx-auto text-gray-800 p-6 sm:p-8 transform opacity-0 scale-95">
+            
+            <div class="flex items-start justify-between mb-4">
+                 <h3 class="text-2xl font-bold text-gray-900" data-i18n="modalAuthErrorTitle"></h3>
+                 <button id="close-modal-button-x" type="button" class="absolute top-4 right-4 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center">
+                    <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                    <span class="sr-only">Close modal</span>
+                </button>
+            </div>
+
+            <p class="mb-8 text-base leading-relaxed text-gray-600" data-i18n="modalAuthErrorBody"></p>
+
+            <!-- ▼ ボタンにTailwindのユーティリティクラスを追加してスタイルを共通化 -->
+            <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+                <button id="close-modal-button" type="button" class="btn btn-secondary w-full sm:w-auto font-bold py-3 px-6 rounded-lg" data-i18n="modalCloseButton">閉じる</button>
+                <a id="apply-button" href="keyvox-ps.html" target="_blank" class="btn btn-primary btn-animated w-full sm:w-auto font-bold py-3 px-6 rounded-lg" data-i18n="modalApplyButton">お申し込み</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/i18n.js"></script>
+    <script src="scripts/bacs-top.js" defer></script>
+</body>
+</html>

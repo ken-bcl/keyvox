@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="page_title">Keyvox - ようこそ！最適なプランで始めましょう</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Language switcher button and dropdown -->
+    <div id="language-switcher" class="fixed top-6 right-6 z-50">
+        <div class="relative">
+            <button id="language-switcher-toggle" type="button" class="p-2 rounded-full border border-gray-300 bg-white text-gray-500 shadow-sm hover:bg-gray-50 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+                </svg>
+            </button>
+            <div id="language-options" class="lang-dropdown hidden absolute right-0 mt-2 w-40 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <div class="py-1" role="none">
+                    <!-- ★★★★★ 修正箇所 ★★★★★ -->
+                    <!-- buttonをaタグに、data-lang-codeをdata-langに変更 -->
+                    <a href="#" id="lang-ja" data-lang="ja" class="text-gray-700 block w-full text-left px-4 py-2 text-sm hover:bg-gray-100" role="menuitem" data-i18n="langJa"></a>
+                    <a href="#" id="lang-en" data-lang="en" class="text-gray-700 block w-full text-left px-4 py-2 text-sm hover:bg-gray-100" role="menuitem" data-i18n="langEn"></a>
+                    <!-- ★★★★★ 修正はここまで ★★★★★ -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main container with two columns: form and right pane -->
+    <div class="w-full max-w-6xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden md:grid md:grid-cols-2 h-full md:h-[90vh] md:max-h-[800px]">
+
+        <!-- Left side: header, main content, and footer -->
+        <div class="grid grid-rows-[auto_1fr_auto] h-full min-h-0 relative">
+            <!-- Header with logo and navigation steps -->
+            <header class="px-8 md:px-12 pt-6">
+                <a href="#"><img src="img/keyvox_1.png" alt="KEYVOX Logo" class="h-8"></a>
+                <nav class="mt-6 flex items-center space-x-2 text-sm" aria-label="Signup Steps"></nav>
+            </header>
+
+            <!-- Main content area for step content -->
+            <main class="overflow-y-auto custom-scrollbar px-8 md:px-12 py-6">
+                <div id="step-content"></div>
+            </main>
+
+            <!-- Footer with navigation buttons and total price display -->
+            <footer class="border-t border-slate-200 px-8 md:px-12 py-4">
+                <div class="flex justify-between items-center">
+                    <div id="footer-total-container" class="hidden">
+                        <p class="text-sm text-slate-700 whitespace-nowrap mb-0" data-i18n="plan_footer_total"></p>
+                        <div id="total-price" class="text-3xl font-extrabold text-sky-500">¥0</div>
+                    </div>
+                    <div class="flex items-center gap-4 ml-auto">
+                        <button id="prevBtn" class="px-5 py-2.5 text-slate-600 font-medium rounded-lg hover:bg-slate-100" data-i18n="button_back"></button>
+                        <button id="nextBtn" class="px-8 py-3 text-white font-semibold rounded-lg btn-primary action-btn"></button>
+                    </div>
+                </div>
+            </footer>
+        </div>
+
+        <!-- Right pane with quotes, features, and trusted logos -->
+        <div class="right-pane p-8 md:p-12 hidden md:flex md:flex-col justify-between h-full overflow-y-auto custom-scrollbar">
+            <div>
+                <div class="mb-12">
+                    <ion-icon name="sparkles" class="text-3xl text-yellow-400"></ion-icon>
+                    <blockquote class="mt-4 text-lg text-slate-700 font-medium" data-i18n="right_pane_quote_text"></blockquote>
+                    <footer class="mt-4">
+                        <p class="font-semibold text-slate-800" data-i18n="right_pane_quote_author"></p>
+                        <p class="text-sm text-slate-600" data-i18n="right_pane_quote_author_title"></p>
+                    </footer>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-slate-800" data-i18n="right_pane_features_title"></h3>
+                    <ul class="mt-4 space-y-4 text-slate-700">
+                        <li class="flex items-start"><ion-icon name="checkmark-circle-outline" class="text-2xl brand-text mr-3 mt-0.5 flex-shrink-0"></ion-icon><span data-i18n="right_pane_feature_1"></span></li>
+                        <li class="flex items-start"><ion-icon name="checkmark-circle-outline" class="text-2xl brand-text mr-3 mt-0.5 flex-shrink-0"></ion-icon><span data-i18n="right_pane_feature_2"></span></li>
+                        <li class="flex items-start"><ion-icon name="checkmark-circle-outline" class="text-2xl brand-text mr-3 mt-0.5 flex-shrink-0"></ion-icon><span data-i18n="right_pane_feature_3"></span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-12">
+                 <p class="text-sm font-semibold text-slate-600 text-center tracking-wider" data-i18n="right_pane_trusted_by"></p>
+                 <div class="mt-4 flex justify-around items-center grayscale opacity-60">
+                   <img src="img/nri.png" alt="NRI Logo" style="height: 26px;">
+                   <img src="img/tis.png" alt="TIS Logo" style="height: 50px;">
+                 </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Verification modal for user confirmation -->
+    <div id="verification-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-8 space-y-6 relative">
+        <button id="verification-close-btn" type="button" class="absolute top-4 right-4 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center">
+          <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+          </svg>
+          <span class="sr-only">Close modal</span>
+        </button>
+        <h2 class="text-xl font-bold text-gray-900 text-center mb-4" data-i18n-html="verify_modal_title"></h2>
+        <div class="flex items-center justify-center p-3 border border-gray-200 rounded-md bg-gray-50 mb-4">
+          <div class="flex items-center space-x-4">
+            <input type="checkbox" id="verification-recaptcha" class="h-6 w-6 rounded border-gray-300 text-sky-500">
+            <span class="text-sm text-gray-700" data-i18n="verify_recaptcha_label"></span>
+            <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" alt="reCAPTCHA Logo" class="w-8 h-8">
+          </div>
+        </div>
+        <div class="grid grid-cols-6 gap-1 justify-center">
+          <input type="text" maxlength="1" class="w-12 h-12 text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500" />
+          <input type="text" maxlength="1" class="w-12 h-12 text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500" />
+          <input type="text" maxlength="1" class="w-12 h-12 text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500" />
+          <input type="text" maxlength="1" class="w-12 h-12 text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500" />
+          <input type="text" maxlength="1" class="w-12 h-12 text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500" />
+          <input type="text" maxlength="1" class="w-12 h-12 text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500" />
+        </div>
+        <div class="text-center mt-4">
+          <button id="resend-code-btn" type="button" class="text-sky-500 font-medium hover:underline" data-i18n="verify_modal_resend_link"></button>
+          <div id="resend-success-message" class="hidden p-3 mt-2 rounded-md bg-green-100 text-green-800 text-center font-bold" data-i18n="verify_modal_resend_success">
+          </div>
+        </div>
+        <div class="flex gap-4 mt-6">
+          <button id="back-to-account" type="button" class="flex-1 py-3 bg-gray-100 text-gray-900 rounded-lg font-medium hover:bg-gray-200" data-i18n="verify_modal_back_button"></button>
+          <button id="verify-next" type="button" disabled
+            class="flex-1 py-3 rounded-lg font-medium action-btn
+              text-white
+              disabled:bg-gray-400 disabled:cursor-not-allowed
+              enabled:bg-gray-800 enabled:hover:bg-gray-700 enabled:cursor-pointer"
+            data-i18n="verify_modal_next_button">
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Password reset modal (empty content) -->
+    <div id="password-reset-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-8 sm:p-10 space-y-6 relative">
+            </div>
+    </div>
+
+    <!-- Bank transfer instructions and confirmation modal -->
+    <div id="bank-transfer-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-8 space-y-6 relative">
+        <button id="bank-transfer-close" type="button" class="absolute top-4 right-4 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center">
+          <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+          </svg>
+          <span class="sr-only">Close modal</span>
+        </button>
+        <h2 class="text-xl font-bold text-red-600 text-center mb-4" data-i18n="bank_modal_title"></h2>
+        <p class="text-sm text-gray-700" data-i18n="bank_modal_desc"></p>
+        <ul class="list-disc list-inside text-sm text-gray-700 space-y-2">
+          <li data-i18n="bank_modal_rule1"></li>
+          <li data-i18n="bank_modal_rule2"></li>
+        </ul>
+        <p class="text-sm text-gray-900 font-medium" data-i18n="bank_modal_alt_option"></p>
+        <div class="flex gap-4 mt-6">
+          <button id="bank-transfer-confirm" class="flex-1 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 action-btn" data-i18n="bank_modal_confirm_button"></button>
+          <button id="bank-transfer-cancel" class="flex-1 py-3 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200" data-i18n="bank_modal_cancel_button"></button>
+        <!-- If there is a credit card select button, remove action-btn class as well -->
+        <!-- Example (if present): -->
+        <!--
+        <button id="bank-transfer-creditcard" class="flex-1 py-3 bg-white text-sky-600 rounded-lg border border-sky-600 hover:bg-sky-50" data-i18n="bank_modal_creditcard_button"></button>
+        -->
+        </div>
+      </div>
+    </div>
+
+    <!-- AI chat overlay (hidden by default) -->
+    <div id="aiChatOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        </div>
+
+    <!-- Organization selection modal -->
+    <div id="org-select-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-8 sm:p-10 space-y-6 relative">
+        <button id="org-select-close-btn" type="button" class="absolute top-4 right-4 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center">
+          <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+          </svg>
+          <span class="sr-only">Close modal</span>
+        </button>
+        <h2 class="text-xl font-bold text-gray-800 text-center mb-4" data-i18n="org_select_title"></h2>
+        <select class="custom-select block w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500">
+          <option value="" data-i18n="org_select_placeholder"></option>
+          <option value="org1" data-i18n="org_select_option_a"></option>
+          <option value="org2" data-i18n="org_select_option_b"></option>
+          <option value="org3" data-i18n="org_select_option_c"></option>
+        </select>
+        <div id="org-select-error" class="hidden p-3 mb-4 rounded-md bg-pink-100 text-pink-700 text-center font-bold" data-i18n="org_select_error"></div>
+        <div class="flex gap-4 mt-6">
+          <button onclick="closeOrgModal()" class="flex-1 py-3 bg-gray-100 text-gray-900 rounded-lg font-medium hover:bg-gray-200 transition duration-300" data-i18n="org_select_cancel_button"></button>
+          <button onclick="confirmOrgSelection()" class="flex-1 py-3 rounded-lg font-medium text-white bg-gray-800 hover:bg-gray-700 transition duration-300 action-btn" data-i18n="org_select_login_button"></button>
+        </div>
+      </div>
+    </div>
+    
+    <script src="scripts/i18n.js"></script>
+    <script src="scripts/keyvox-ps.js" defer></script>
+</body>
+</html>
