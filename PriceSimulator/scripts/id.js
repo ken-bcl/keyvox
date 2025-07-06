@@ -283,12 +283,15 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         const onInput = () => {
+            // ▼▼▼ このロジックを修正 ▼▼▼
+            const isLoginPasswordField = formName === 'login' && input.id === 'login-password';
             const isPasswordFieldInSignup = formName === 'signup' && (input.id === 'signup-password-field' || input.id === 'signup-password-confirm');
             const isPasswordFieldInReset = formName === 'forgot-password' && (input.id === 'password-reset-field' || input.id === 'password-reset-confirm');
 
-            if (input.dataset.touched === 'true' || isPasswordFieldInSignup || isPasswordFieldInReset) {
+            if (input.dataset.touched === 'true' || isLoginPasswordField || isPasswordFieldInSignup || isPasswordFieldInReset) {
                 handleValidation();
             }
+            // ▲▲▲ 修正はここまで ▲▲▲
         };
 
         if (input.type === 'checkbox' || input.tagName === 'SELECT') {
