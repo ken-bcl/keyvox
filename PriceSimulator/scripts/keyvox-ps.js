@@ -651,8 +651,22 @@ function initializeApp() {
         });
     };
 
-    const showOrgModal = () => {
+const showOrgModal = () => {
         const modal = document.getElementById('org-select-modal');
+        if (!modal) return;
+        
+        const select = document.getElementById('org-select-dropdown');
+        const loginBtn = document.getElementById('org-select-login-button');
+
+        loginBtn.disabled = true;
+
+        const handleSelectChange = () => {
+            loginBtn.disabled = !select.value;
+        };
+
+        select.removeEventListener('change', handleSelectChange);
+        select.addEventListener('change', handleSelectChange);
+        
         modal.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
     };

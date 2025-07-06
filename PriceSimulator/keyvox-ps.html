@@ -189,16 +189,19 @@
           <span class="sr-only">Close modal</span>
         </button>
         <h2 class="text-xl font-bold text-gray-800 text-center mb-4" data-i18n="org_select_title"></h2>
-        <select class="custom-select block w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500">
+        
+        <select id="org-select-dropdown" class="custom-select block w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500">
           <option value="" data-i18n="org_select_placeholder"></option>
           <option value="org1" data-i18n="org_select_option_a"></option>
           <option value="org2" data-i18n="org_select_option_b"></option>
           <option value="org3" data-i18n="org_select_option_c"></option>
         </select>
+        
         <div id="org-select-error" class="hidden p-3 mb-4 rounded-md bg-pink-100 text-pink-700 text-center font-bold" data-i18n="org_select_error"></div>
         <div class="flex gap-4 mt-6">
           <button onclick="closeOrgModal()" class="flex-1 py-3 rounded-lg font-medium btn btn-secondary" data-i18n="org_select_cancel_button"></button>
-          <button onclick="confirmOrgSelection()" class="flex-1 py-3 rounded-lg font-medium btn btn-primary action-btn" data-i18n="org_select_login_button"></button>
+          
+          <button id="org-select-login-button" onclick="confirmOrgSelection()" class="flex-1 py-3 rounded-lg font-medium btn btn-primary action-btn" data-i18n="org_select_login_button"></button>
         </div>
       </div>
     </div>
