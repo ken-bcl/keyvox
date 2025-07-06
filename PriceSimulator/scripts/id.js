@@ -359,7 +359,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 1200);
         });
     }
-    handleFormSubmit('login-form', 'bacs-top.html');
+    handleFormSubmit('login-form', 'index.html#autherror');
     handleFormSubmit('signup-form', 'keyvox-ps.html#step3');
     handleFormSubmit('forgot-password-form', '#');
 
