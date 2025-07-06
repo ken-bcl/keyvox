@@ -372,4 +372,34 @@ document.addEventListener('DOMContentLoaded', () => {
     showView((window.location.hash.includes('signup')) ? signupView : loginView);
     document.querySelectorAll('form input, form select').forEach(setupValidationForInput);
     validateAllForms();
+
+    // === トラッキング: ソーシャルログイン・ログイン方法切替 ===
+    // ソーシャルログインボタン（Google, Appleなど）クリックイベントのトラッキング
+    document.querySelectorAll('.form-panel > div.flex.justify-between > button').forEach(button => {
+      button.addEventListener('click', () => {
+        const provider = button.textContent.trim().toLowerCase();
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: 'social_login_click',
+          provider: provider,
+        });
+      });
+    });
+
+    // ログイン方法切替ボタンのトラッキング
+    document.getElementById('login-method-phone')?.addEventListener('click', () => {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: 'login_method_select',
+        method: 'phone',
+      });
+    });
+
+    document.getElementById('login-method-account')?.addEventListener('click', () => {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: 'login_method_select',
+        method: 'account',
+      });
+    });
 });

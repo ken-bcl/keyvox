@@ -5,6 +5,16 @@
    ========================================== */
 
 // --- i18n & Global State ---
+
+window.dataLayer = window.dataLayer || [];
+
+function trackStep(stepNumber, routeType = '') {
+  window.dataLayer.push({
+    event: 'step_view',
+    step: stepNumber,
+    route_type: routeType,
+  });
+}
 let currentLang = localStorage.getItem('lang')
     || ((navigator.language || navigator.userLanguage).startsWith('en') ? 'en' : 'ja');
 window.isTrialLater = false;
@@ -473,6 +483,7 @@ function initializeApp() {
         
         updateNavigationUI();
         updateLanguage(currentLang);
+        trackStep(currentStep, window.currentRouteType || '');
 
         if (currentStep === 1) initPlanConfigurator();
         if (currentStep === 2) initAccountMethodStep();
