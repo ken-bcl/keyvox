@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KEYVOX KAI - 置き配デモ</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Google Fonts for a modern look */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        /* Keyframe animations for smooth transitions */
+        @keyframes slide-up-fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slide-in-from-right { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        @keyframes slide-out-to-left { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+        @keyframes slide-in-from-left { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+        @keyframes slide-out-to-right { from { transform: translateX(0); } to { transform: translateX(100%); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        /* Shake animation for validation feedback */
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        /* Animation utility classes */
+        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        .animate-slide-up { animation: slide-up-fade-in 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
+        .animate-shake { animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both; }
+        .view-enter { animation: slide-in-from-right 0.3s ease-out forwards; }
+        .view-exit { animation: slide-out-to-left 0.3s ease-out forwards; }
+        .view-enter-back { animation: slide-in-from-left 0.3s ease-out forwards; }
+        .view-exit-back { animation: slide-out-to-right 0.3s ease-out forwards; }
+
+        /* Modal backdrop for focus */
+        .modal-backdrop {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px);
+            z-index: 45;
+            display: none;
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <!-- Smartphone mock container -->
+    <div class="w-full max-w-sm h-[700px] bg-white rounded-3xl shadow-2xl flex flex-col overflow-hidden relative">
+
+        <!-- Header Section -->
+        <div id="main-header" class="bg-white text-gray-800 p-4 flex items-center justify-between z-40 flex-shrink-0 border-b border-gray-200">
+            <div class="flex-1 flex justify-start">
+                <div class="w-10">
+                    <div id="header-left-container">
+                        <button id="admin-settings-button" class="text-gray-600 p-2 rounded-full hover:bg-gray-100"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" /></svg></button>
+                    </div>
+                    <button id="header-back-button" class="text-gray-600 p-2 rounded-full hover:bg-gray-100 hidden"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg></button>
+                </div>
+            </div>
+            <div class="flex-shrink-0"><h1 id="header-title" class="text-lg font-semibold">KEYVOX KAI</h1></div>
+            <div class="flex-1 flex justify-end items-center"><button class="p-2 rounded-full text-gray-600 hover:bg-gray-100"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" /></svg></button></div>
+        </div>
+
+        <!-- View Container -->
+        <div class="flex-grow relative overflow-hidden">
+            <!-- Home View -->
+            <div id="home-view" class="absolute inset-0 flex flex-col z-10 bg-gray-50">
+                <div id="scrollable-content" class="flex-grow p-4 space-y-4 overflow-y-auto">
+                    <div class="flex items-start space-x-3 mt-0"><div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-r from-pink-400 to-rose-400 text-white font-bold text-sm">KAI</div><div class="bg-white text-gray-800 p-3 rounded-tr-xl rounded-br-xl rounded-bl-xl max-w-[75%] animate-fade-in border border-gray-200 shadow-sm"><p>こんにちは！👋<br>置き配のご依頼は左下のメニューアイコンをタップしてください。</p></div></div>
+                    <div id="home-chat-messages"></div>
+                    <div id="kai-parcel-notification-wrapper" class="flex items-start space-x-3 mt-0 animate-slide-up">
+                         <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-r from-pink-400 to-rose-400 text-white font-bold text-sm">KAI</div>
+                         <div class="bg-white text-gray-800 p-3 rounded-tr-xl rounded-br-xl rounded-bl-xl max-w-[75%] border border-gray-200 shadow-sm">
+                             <p>お荷物が宅配ロッカーに届いています！🚚</p>
+                             <button id="go-to-locker-button" class="mt-3 w-full text-sm bg-indigo-100 text-indigo-700 font-semibold py-2 px-4 rounded-lg hover:bg-indigo-200 transition-colors">着荷リストを確認する</button>
+                         </div>
+                     </div>
+                </div>
+                <div class="border-t border-gray-200 p-3 bg-white flex items-center space-x-2 z-10 flex-shrink-0">
+                    <button id="quick-menu-button" class="p-2 rounded-full hover:bg-gray-100 transition-colors"><svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg></button>
+                    <input type="text" id="chat-input" class="flex-grow p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="メッセージを入力..."><button id="send-button" class="bg-gradient-to-r from-pink-400 to-rose-400 text-white p-3 rounded-full shadow-sm hover:opacity-90 transition-opacity"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg></button>
+                </div>
+            </div>
+            
+            <!-- Admin Settings View -->
+            <div id="admin-settings-view" class="absolute inset-0 flex-col z-20 bg-gray-50 hidden"><div class="flex-grow p-4 space-y-6 overflow-y-auto"><div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm"><h3 class="font-bold text-gray-800 mb-4 text-lg">部屋の追加</h3><form id="add-room-form" class="space-y-4"><div><label for="room-name" class="block text-sm font-medium text-gray-700">部屋名</label><input type="text" id="room-name" name="room-name" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></div><div><label for="resident-name" class="block text-sm font-medium text-gray-700">居住者名</label><input type="text" id="resident-name" name="resident-name" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></div><div><label for="invite-email" class="block text-sm font-medium text-gray-700">招待リンク送付先 (メールアドレス)</label><input type="email" id="invite-email" name="invite-email" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></div><button type="submit" class="w-full bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors">部屋を追加する</button></form></div><div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm"><h3 class="font-bold text-gray-800 mb-4 text-lg">部屋リスト</h3><div id="room-list" class="space-y-3"></div></div></div></div>
+
+            <!-- Parcel Locker View -->
+            <div id="parcel-locker-view" class="absolute inset-0 flex flex-col z-20 bg-gray-50 hidden">
+                <div class="p-4 flex-shrink-0 border-b border-gray-200">
+                    <div id="usage-summary-grid" class="grid grid-cols-2 gap-4">
+                        <!-- Content is dynamically generated by JS -->
+                    </div>
+                    <div id="subscription-area" class="mt-4">
+                        <!-- Content is dynamically generated by JS -->
+                    </div>
+                </div>
+                <div id="parcel-list-container" class="flex-grow p-4 space-y-4 overflow-y-auto">
+                    <!-- Parcel items will be injected here by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Action Menu -->
+        <div id="quick-menu" class="absolute bottom-20 left-4 right-4 bg-transparent z-50 hidden">
+            <div class="space-y-3 animate-slide-up">
+                <div id="quick-locker-button" class="bg-white p-4 rounded-xl shadow-lg border border-gray-200 flex items-center space-x-4 cursor-pointer hover:bg-gray-50 transition-colors">
+                    <div class="bg-indigo-50 p-3 rounded-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" /></svg></div>
+                    <div><h3 class="font-semibold text-gray-800">クイック宅配ロッカー</h3><p class="text-sm text-gray-500">着荷リストの確認と解錠</p></div>
+                </div>
+                <div id="quick-delivery-button" class="bg-white p-4 rounded-xl shadow-lg border border-gray-200 flex items-center space-x-4 cursor-pointer hover:bg-gray-50 transition-colors">
+                    <div class="bg-indigo-50 p-3 rounded-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg></div>
+                    <div><h3 class="font-semibold text-gray-800">クイック置き配</h3><p class="text-sm text-gray-500">宅配の伝票番号を通知</p></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dimmed background overlay -->
+        <div id="modal-backdrop" class="modal-backdrop"></div>
+        
+        <!-- Modals -->
+        <div id="delivery-modal" class="fixed inset-0 z-[60] hidden items-center justify-center p-4"><div id="delivery-modal-content" class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-xs"><h2 class="text-lg font-bold text-gray-800 text-center mb-4">クイック置き配</h2><p class="text-center text-gray-600 mb-6">宅配の伝票番号を入力してください。</p><div class="space-y-4"><input type="text" id="tracking-number-input" class="w-full px-4 py-3 text-center text-lg tracking-widest border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="xxxx-xxxx-xxxx" maxlength="14"><button id="submit-tracking-number" class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-lg hover:bg-indigo-700 transition-colors disabled:bg-indigo-300 disabled:cursor-not-allowed">配達員に通知する</button><button id="close-delivery-modal" class="w-full text-gray-600 font-medium py-2 rounded-lg hover:bg-gray-100 transition-colors">キャンセル</button></div></div></div>
+        <div id="admin-login-modal" class="fixed inset-0 z-[70] hidden items-center justify-center p-4"><div id="admin-login-modal-content" class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-xs animate-slide-up"><h2 class="text-lg font-bold text-gray-800 text-center mb-4">管理者アクセス</h2><p class="text-center text-gray-600 mb-6">続行するにはパスワードを入力してください。</p><form id="admin-login-form" class="space-y-4"><input type="password" id="admin-password-input" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="パスワード"><p id="admin-login-error" class="text-red-500 text-sm text-center hidden">パスワードが違います。</p><button type="submit" class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-lg hover:bg-indigo-700 transition-colors">ログイン</button><button type="button" id="close-admin-login-modal" class="w-full text-gray-600 font-medium py-2 rounded-lg hover:bg-gray-100 transition-colors">キャンセル</button></form></div></div>
+        <div id="delete-confirm-modal" class="fixed inset-0 z-[70] hidden items-center justify-center p-4"><div id="delete-confirm-modal-content" class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-xs animate-slide-up"><h2 class="text-lg font-bold text-gray-800 text-center mb-2">削除の確認</h2><p id="delete-confirm-text" class="text-center text-gray-600 mb-6"></p><div class="flex gap-4"><button id="cancel-delete-button" class="flex-1 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-100 border border-gray-300 transition-colors">キャンセル</button><button id="confirm-delete-button" class="flex-1 bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-700 transition-colors">はい、削除します</button></div></div></div>
+        <div id="overdue-payment-modal" class="fixed inset-0 z-[80] hidden items-center justify-center p-4"><div class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-xs animate-slide-up text-center"><svg class="mx-auto h-12 w-12 text-yellow-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg><h2 class="text-lg font-bold text-gray-800 mt-4">無料受け取り期日が過ぎています</h2><p class="text-gray-600 mt-2">お受け取りには <span class="font-bold text-xl text-red-600">300円</span> のお支払いをお願いします。</p><div class="mt-6 space-y-2"><button id="pay-overdue-fee-button" class="w-full bg-black text-white font-semibold py-3 rounded-lg hover:bg-gray-800 transition-colors flex items-center justify-center"><svg class="w-6 h-6 mr-2" viewBox="0 0 128 128" fill="white"><path d="M107.2,60.9c-0.3-15.6-12.6-26.6-27.1-26.6c-9.2,0-16.6,4.6-21.7,4.6c-5.4,0-14.3-5.1-24.1-4.9 c-14.5,0.3-27.4,11.2-27.4,27.7c0,10.1,5.2,21.4,12.8,29.9c5.9,6.6,12.3,13.8,20.8,13.5c8.1-0.3,11-4.4,20.6-4.4 c9.4,0,12,4.4,20.8,4.2c8.8-0.2,14.1-6.6,19.9-13.2c6.2-7.1,8.9-15.4,9-24.6C111.4,65.3,107.2,60.9,107.2,60.9z M86.9,23.3 c5.4-6.3,9.1-15.1,8.6-24.2c-7.5,0.5-16.4,5.9-22.1,12.1c-5.1,5.6-9.6,14.3-8.9,23.3C72.1,35,81.1,29.9,86.9,23.3z"></path></svg><span>支払う</span></button><button id="cancel-payment-button" class="w-full text-gray-600 font-medium py-2 rounded-lg hover:bg-gray-100 transition-colors">キャンセル</button></div></div></div>
+        <div id="qr-modal" class="fixed inset-0 z-[90] hidden items-center justify-center p-4"><div id="qr-modal-content" class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-xs text-center animate-slide-up"><img id="qr-modal-image" src="" alt="解錠用QRコード" class="w-56 h-56 mx-auto bg-gray-100 rounded-lg"><p class="text-gray-600 mt-4">ロッカーの読取機にかざしてください</p><p id="qr-extra-message" class="mt-2 font-bold text-red-600 hidden"></p><button id="close-qr-modal" class="mt-6 w-full bg-gray-200 text-gray-800 font-semibold py-2 rounded-lg hover:bg-gray-300">閉じる</button></div></div>
+        <div id="processing-view" class="absolute inset-0 bg-gray-50/80 backdrop-blur-sm flex-col z-[100] hidden items-center justify-center space-y-4"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-t-2 border-indigo-500"></div><p class="text-lg font-semibold text-gray-600">支払い処理中...</p></div>
+        <div id="terms-modal" class="fixed inset-0 z-[80] hidden items-center justify-center p-4"><div class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-xs animate-slide-up"><h2 class="text-lg font-bold text-gray-800 text-center mb-4">宅配ロッカー利用規約</h2><div class="text-sm text-gray-600 space-y-2 max-h-48 overflow-y-auto pr-2"><p>本サービスは居住者がより便利に、より公平に宅配ロッカーをご利用いただけるサービスです。</p><p>月間の無料利用回数には上限があり、超過した場合は所定の料金が発生します。また、お荷物の保管期間には限りがあり、期日を超過したお受け取りには延滞料金が必要となりますのでご注意ください。</p><p>詳細は利用ガイドをご確認ください。本サービスの利用を開始することで、これらの規約に同意したものとみなされます。</p></div><div class="mt-6 flex gap-4"><button id="disagree-terms-button" class="flex-1 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-100 border border-gray-300 transition-colors">同意しない</button><button id="agree-terms-button" class="flex-1 bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors">同意する</button></div></div></div>
+        <div id="subscription-payment-modal" class="fixed inset-0 z-[80] hidden items-center justify-center p-4"><div class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-xs animate-slide-up text-center"><h2 class="text-lg font-bold text-gray-800 mt-4">使い放題プラン</h2><p class="text-gray-600 mt-2">月額 <span class="font-bold text-xl text-indigo-600">1,000円</span> でお申し込みいただけます。</p><div class="mt-6 space-y-2"><button id="pay-subscription-button" class="w-full bg-black text-white font-semibold py-3 rounded-lg hover:bg-gray-800 transition-colors flex items-center justify-center"><svg class="w-6 h-6 mr-2" viewBox="0 0 128 128" fill="white"><path d="M107.2,60.9c-0.3-15.6-12.6-26.6-27.1-26.6c-9.2,0-16.6,4.6-21.7,4.6c-5.4,0-14.3-5.1-24.1-4.9 c-14.5,0.3-27.4,11.2-27.4,27.7c0,10.1,5.2,21.4,12.8,29.9c5.9,6.6,12.3,13.8,20.8,13.5c8.1-0.3,11-4.4,20.6-4.4 c9.4,0,12,4.4,20.8,4.2c8.8-0.2,14.1-6.6,19.9-13.2c6.2-7.1,8.9-15.4,9-24.6C111.4,65.3,107.2,60.9,107.2,60.9z M86.9,23.3 c5.4-6.3,9.1-15.1,8.6-24.2c-7.5,0.5-16.4,5.9-22.1,12.1c-5.1,5.6-9.6,14.3-8.9,23.3C72.1,35,81.1,29.9,86.9,23.3z"></path></svg><span>支払う</span></button><button id="cancel-subscription-payment-button" class="w-full text-gray-600 font-medium py-2 rounded-lg hover:bg-gray-100 transition-colors">キャンセル</button></div></div></div>
+        <div id="cancel-subscription-confirm-modal" class="fixed inset-0 z-[80] hidden items-center justify-center p-4"><div class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-xs animate-slide-up"><h2 class="text-lg font-bold text-gray-800 text-center mb-2">使い放題をキャンセルしますか？</h2><p class="text-center text-gray-600 mb-6">月末でのご解約となります。</p><div class="flex gap-4"><button id="back-from-cancel-button" class="flex-1 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-100 border border-gray-300 transition-colors">戻る</button><button id="confirm-cancel-subscription-button" class="flex-1 bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-700 transition-colors">使い放題をキャンセルする</button></div></div></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- State Management ---
+            let state = {
+                viewHistory: ['home-view'],
+                rooms: [ 
+                    { id: 1, roomName: '101号室', residentName: '山田 太郎', email: 'yamada.taro@example.com', startDate: '2023-05-01', lastUsed: '2023-07-08' },
+                    { id: 2, roomName: '102号室', residentName: '鈴木 花子', email: 'suzuki.hanako@example.com', startDate: '2023-06-15', lastUsed: '2023-07-05' },
+                ],
+                parcels: [], 
+                roomIdToDelete: null,
+                parcelToUnlock: null,
+                hasAgreedToLockerTerms: false,
+                isSubscribed: false,
+            };
+
+            // --- DOM Element Cache ---
+            const elements = {
+                header: { title: document.getElementById('header-title'), backButton: document.getElementById('header-back-button'), leftContainer: document.getElementById('header-left-container') },
+                views: { 'home-view': document.getElementById('home-view'), 'admin-settings-view': document.getElementById('admin-settings-view'), 'parcel-locker-view': document.getElementById('parcel-locker-view') },
+                home: { chatMessages: document.getElementById('home-chat-messages'), scrollableContent: document.getElementById('scrollable-content'), goToLockerButton: document.getElementById('go-to-locker-button') },
+                quickMenu: { button: document.getElementById('quick-menu-button'), menu: document.getElementById('quick-menu'), deliveryButton: document.getElementById('quick-delivery-button'), lockerButton: document.getElementById('quick-locker-button') },
+                modals: { backdrop: document.getElementById('modal-backdrop') },
+                deliveryModal: { modal: document.getElementById('delivery-modal'), content: document.getElementById('delivery-modal-content'), input: document.getElementById('tracking-number-input'), submitButton: document.getElementById('submit-tracking-number'), closeButton: document.getElementById('close-delivery-modal') },
+                admin: { settingsButton: document.getElementById('admin-settings-button'), loginModal: document.getElementById('admin-login-modal'), loginForm: document.getElementById('admin-login-form'), passwordInput: document.getElementById('admin-password-input'), loginError: document.getElementById('admin-login-error'), closeLoginModal: document.getElementById('close-admin-login-modal'), addRoomForm: document.getElementById('add-room-form'), roomList: document.getElementById('room-list') },
+                deleteConfirm: { modal: document.getElementById('delete-confirm-modal'), text: document.getElementById('delete-confirm-text'), cancelButton: document.getElementById('cancel-delete-button'), confirmButton: document.getElementById('confirm-delete-button') },
+                parcelLocker: { listContainer: document.getElementById('parcel-list-container'), subscriptionArea: document.getElementById('subscription-area'), usageSummaryGrid: document.getElementById('usage-summary-grid') },
+                overduePayment: { modal: document.getElementById('overdue-payment-modal'), payButton: document.getElementById('pay-overdue-fee-button'), cancelButton: document.getElementById('cancel-payment-button') },
+                qrModal: { modal: document.getElementById('qr-modal'), image: document.getElementById('qr-modal-image'), extraMessage: document.getElementById('qr-extra-message'), closeButton: document.getElementById('close-qr-modal') },
+                processingView: document.getElementById('processing-view'),
+                termsModal: { modal: document.getElementById('terms-modal'), agreeButton: document.getElementById('agree-terms-button'), disagreeButton: document.getElementById('disagree-terms-button') },
+                subscriptionPayment: { modal: document.getElementById('subscription-payment-modal'), payButton: document.getElementById('pay-subscription-button'), cancelButton: document.getElementById('cancel-subscription-payment-button') },
+                cancelSubscription: { modal: document.getElementById('cancel-subscription-confirm-modal'), confirmButton: document.getElementById('confirm-cancel-subscription-button'), backButton: document.getElementById('back-from-cancel-button') },
+            };
+
+            // --- View Management ---
+            const _transition = (fromView, toView, direction) => { if (!toView) return; const isBack = direction === 'back'; const enterClass = isBack ? 'view-enter-back' : 'view-enter'; const exitClass = isBack ? 'view-exit-back' : 'view-exit'; toView.style.display = 'flex'; toView.classList.add(enterClass); if (fromView) { fromView.classList.add(exitClass); setTimeout(() => { fromView.style.display = 'none'; fromView.classList.remove(exitClass); }, 300); } setTimeout(() => toView.classList.remove(enterClass), 300); };
+            const updateHeader = (viewId) => { const isSubView = viewId !== 'home-view'; elements.header.backButton.classList.toggle('hidden', !isSubView); elements.header.leftContainer.classList.toggle('hidden', isSubView); const titles = { 'home-view': 'KEYVOX KAI', 'admin-settings-view': '置き配設定モード', 'parcel-locker-view': '宅配ロッカー' }; elements.header.title.textContent = titles[viewId] || 'KEYVOX KAI'; };
+            const showView = (viewId) => { const currentViewId = state.viewHistory[state.viewHistory.length - 1]; if (currentViewId === viewId) return; const fromView = elements.views[currentViewId]; const toView = elements.views[viewId]; state.viewHistory.push(viewId); _transition(fromView, toView, 'forward'); updateHeader(viewId); if (viewId === 'parcel-locker-view') { renderUsageSummary(); renderSubscriptionArea(); renderParcelList(); } };
+            const goBack = () => { if (state.viewHistory.length <= 1) return; const fromViewId = state.viewHistory.pop(); const toViewId = state.viewHistory[state.viewHistory.length - 1]; _transition(elements.views[fromViewId], elements.views[toViewId], 'back'); updateHeader(toViewId); };
+
+            // --- UI Rendering ---
+            const maskEmail = (email) => {
+                if (!email || email.indexOf('@') === -1) return 'メール未設定';
+                const [localPart, domain] = email.split('@');
+                if (localPart.length <= 2) return `${localPart.substring(0, 1)}***@${domain}`;
+                return `${localPart.substring(0, 2)}***@${domain}`;
+            };
+            const renderUsageSummary = () => {
+                const grid = elements.parcelLocker.usageSummaryGrid;
+                if (state.isSubscribed) {
+                    grid.innerHTML = `
+                        <div class="bg-white p-3 rounded-lg border border-gray-200 text-center shadow-sm">
+                            <p class="text-xs text-gray-500">先月のご利用</p>
+                            <p class="font-bold text-gray-800"><span class="text-lg">35</span>回 / <span class="text-lg">¥1,000</span></p>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg border border-gray-200 text-center shadow-sm">
+                            <p class="text-xs text-gray-500">今月のご利用</p>
+                            <p class="font-bold text-gray-800"><span class="text-lg">20</span>回 / <span class="text-lg">¥1,000</span></p>
+                        </div>
+                    `;
+                } else {
+                    grid.innerHTML = `
+                        <div class="bg-white p-3 rounded-lg border border-gray-200 text-center shadow-sm">
+                            <p class="text-xs text-gray-500">先月のご利用</p>
+                            <p class="font-bold text-gray-800"><span class="text-lg">5</span>回 / <span class="text-lg">¥500</span></p>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg border border-gray-200 text-center shadow-sm">
+                            <p class="text-xs text-gray-500">今月のご利用</p>
+                            <p class="font-bold text-gray-800"><span class="text-lg">3</span>回 / <span class="text-lg">¥300</span></p>
+                        </div>
+                    `;
+                }
+            };
+            const renderSubscriptionArea = () => {
+                const area = elements.parcelLocker.subscriptionArea;
+                if (state.isSubscribed) {
+                    area.innerHTML = `<button class="w-full bg-green-100 text-green-800 font-semibold py-2 px-4 rounded-lg border-2 border-green-200 cursor-default">使い放題利用中</button><button id="cancel-subscription-button" class="w-full text-sm text-gray-500 hover:text-red-600 mt-2 py-1">使い放題をキャンセル</button>`;
+                    area.querySelector('#cancel-subscription-button').addEventListener('click', () => showModal(elements.cancelSubscription.modal));
+                } else {
+                    area.innerHTML = `<button id="subscribe-button" class="w-full bg-white text-indigo-600 font-semibold py-2 px-4 rounded-lg border-2 border-indigo-500 hover:bg-indigo-50 transition-colors">使い放題を月額1,000円で申し込む</button>`;
+                    area.querySelector('#subscribe-button').addEventListener('click', () => showModal(elements.subscriptionPayment.modal));
+                }
+            };
+            const renderParcelList = () => { const container = elements.parcelLocker.listContainer; container.innerHTML = ''; if (state.parcels.length === 0) { container.innerHTML = `<div class="text-center text-gray-500 pt-16"><p>現在、お預かりしているお荷物はありません。</p></div>`; return; } state.parcels.forEach(parcel => { const deadlineDate = new Date(parcel.deadline); const arrivalDate = new Date(parcel.arrivalDate); const isOverdue = parcel.overdueDays > 0; const card = document.createElement('div'); card.className = `bg-white p-4 rounded-xl border ${isOverdue ? 'border-red-300' : 'border-gray-200'} shadow-sm space-y-3`; card.innerHTML = `<div class="flex justify-between items-center"><span class="text-sm font-medium text-gray-500">着荷日: ${arrivalDate.toLocaleDateString('ja-JP')}</span> ${isOverdue ? `<span class="px-2 py-1 text-xs font-bold text-red-800 bg-red-100 rounded-full">${parcel.overdueDays}日延滞中</span>` : ''}</div><div class="text-center"><p class="text-sm text-gray-600">受け取り期日</p><p class="text-2xl font-bold ${isOverdue ? 'text-red-600' : 'text-gray-800'}">${(deadlineDate.getMonth() + 1)}/${deadlineDate.getDate()}</p></div><div class="text-center text-xs text-gray-500 pt-2 border-t">今月の累計利用回数: ${parcel.usageCount}回目 / ${parcel.totalUsage}回</div><button data-parcel-id="${parcel.id}" class="unlock-qr-button w-full ${isOverdue ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-indigo-600 hover:bg-indigo-700'} text-white font-semibold py-3 rounded-lg transition-colors">解錠QRコード</button>`; container.appendChild(card); }); };
+            const renderRoomList = () => {
+                const listContainer = elements.admin.roomList;
+                listContainer.innerHTML = '';
+                if (state.rooms.length === 0) { listContainer.innerHTML = `<p class="text-center text-gray-500 py-4">登録されている部屋はありません。</p>`; return; }
+                state.rooms.forEach(room => {
+                    const roomEl = document.createElement('div');
+                    roomEl.className = 'p-3 border rounded-lg bg-gray-50 space-y-2';
+                    roomEl.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-semibold text-gray-800">${room.roomName}</p>
+                                <p class="text-sm text-gray-600">${room.residentName}</p>
+                                <p class="text-sm text-gray-500">${maskEmail(room.email)}</p>
+                            </div>
+                            <button data-room-id="${room.id}" class="delete-room-button text-xs font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-md px-2 py-1 transition-colors">削除</button>
+                        </div>
+                        <div class="text-xs text-gray-500 pt-2 border-t flex justify-between">
+                            <span>登録日: ${room.startDate}</span>
+                            <span>最終利用: ${room.lastUsed}</span>
+                        </div>`;
+                    listContainer.appendChild(roomEl);
+                });
+            };
+            const addMessageToHome = (sender, textOrHtml, isRawHtml = false) => { const chatArea = elements.home.chatMessages; const messageDiv = document.createElement('div'); messageDiv.className = 'animate-slide-up flex items-start space-x-3 w-full mb-4'; if (sender === 'ai') { const content = isRawHtml ? textOrHtml : `<p>${textOrHtml.replace(/\n/g, '<br>')}</p>`; messageDiv.innerHTML = `<div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-r from-pink-400 to-rose-400 text-white font-bold text-sm">KAI</div><div class="bg-white border border-gray-200 text-gray-800 p-3 rounded-tr-xl rounded-br-xl rounded-bl-xl max-w-[75%] break-words shadow-sm">${content}</div>`; } else { messageDiv.className += ' justify-end'; messageDiv.innerHTML = `<div class="bg-indigo-500 text-white p-3 rounded-tl-xl rounded-bl-xl rounded-br-xl max-w-[75%] break-words shadow-sm"><p>${textOrHtml}</p></div>`; } chatArea.appendChild(messageDiv); elements.home.scrollableContent.scrollTop = elements.home.scrollableContent.scrollHeight; };
+
+            // --- Modal & Menu Management ---
+            const showModal = (modal, backdrop = true) => { if(backdrop) elements.modals.backdrop.style.display = 'block'; modal.classList.remove('hidden'); modal.classList.add('flex'); };
+            const hideModal = (modal, backdrop = true) => { if(backdrop) elements.modals.backdrop.style.display = 'none'; modal.classList.add('hidden'); modal.classList.remove('flex'); };
+            const toggleQuickMenu = (forceClose = false) => { const isHidden = elements.quickMenu.menu.classList.contains('hidden'); if (forceClose || !isHidden) { elements.quickMenu.menu.classList.add('hidden'); elements.modals.backdrop.style.display = 'none'; } else { elements.quickMenu.menu.classList.remove('hidden'); elements.modals.backdrop.style.display = 'block'; } };
+            
+            // --- Event Handlers ---
+            const handleUnlockParcel = (e) => { const button = e.target.closest('.unlock-qr-button'); if (!button) return; const parcelId = button.dataset.parcelId; const parcel = state.parcels.find(p => p.id === parcelId); if (!parcel) return; state.parcelToUnlock = parcel; if (parcel.overdueDays > 0) { showModal(elements.overduePayment.modal); } else { showQrModal(); } };
+            const showQrModal = (paid = false) => { const parcel = state.parcelToUnlock; if (!parcel) return; elements.qrModal.image.src = `https://placehold.co/224x224/333/FFF?text=${encodeURIComponent(parcel.id)}`; if (paid) { elements.qrModal.extraMessage.textContent = '本日中にお受け取りください'; elements.qrModal.extraMessage.classList.remove('hidden'); } else { elements.qrModal.extraMessage.classList.add('hidden'); } showModal(elements.qrModal.modal); };
+            const handlePayOverdueFee = () => { hideModal(elements.overduePayment.modal, false); showModal(elements.processingView, false); setTimeout(() => { hideModal(elements.processingView); showQrModal(true); }, 2000); };
+            const handleConfirmSubscription = () => { hideModal(elements.subscriptionPayment.modal, false); showModal(elements.processingView, false); setTimeout(() => { hideModal(elements.processingView, true); state.isSubscribed = true; renderSubscriptionArea(); renderUsageSummary(); }, 2000); };
+            const handleCancelSubscription = () => { state.isSubscribed = false; hideModal(elements.cancelSubscription.modal); renderSubscriptionArea(); renderUsageSummary(); };
+
+            // --- Other Handlers ---
+            const handleSubmitTrackingNumber = () => { const trackingNumber = elements.deliveryModal.input.value.trim(); if (trackingNumber.length !== 14) { elements.deliveryModal.content.classList.add('animate-shake'); setTimeout(() => { elements.deliveryModal.content.classList.remove('animate-shake'); }, 820); return; } hideModal(elements.deliveryModal.modal); setTimeout(() => { addMessageToHome('ai', `伝票番号[<b>${trackingNumber}</b>]<br>ですね。配達員に通知します。<br>到着までお待ち下さい！`, true); }, 500); setTimeout(() => { addMessageToHome('ai', `宅配員がエントランスを通過しました。🚪🚶‍♂️💨<br>もうすぐお荷物が置き配されます♪ 📦✨`, true); }, 3500); };
+            const formatTrackingNumber = (e) => { let input = e.target.value.replace(/\D/g, '').substring(0, 12); let formattedInput = input.replace(/(\d{4})(?=\d)/, '$1-').replace(/(\d{4}-\d{4})(?=\d)/, '$1-'); e.target.value = formattedInput; elements.deliveryModal.submitButton.disabled = (formattedInput.length !== 14); };
+            const handleAdminLogin = (e) => { e.preventDefault(); if (elements.admin.passwordInput.value === 'admin') { hideModal(elements.admin.loginModal); showView('admin-settings-view'); renderRoomList(); } else { elements.admin.loginError.classList.remove('hidden'); elements.admin.passwordInput.classList.add('border-red-500'); e.target.closest('#admin-login-modal-content').classList.add('animate-shake'); setTimeout(() => e.target.closest('#admin-login-modal-content').classList.remove('animate-shake'), 820); } };
+            const handleAddRoom = (e) => { e.preventDefault(); const formData = new FormData(e.target); const newRoom = { id: Date.now(), roomName: formData.get('room-name'), residentName: formData.get('resident-name'), email: formData.get('invite-email'), startDate: new Date().toISOString().split('T')[0], lastUsed: '未利用' }; state.rooms.push(newRoom); renderRoomList(); e.target.reset(); };
+            const handleDeleteRoom = () => { if (state.roomIdToDelete === null) return; state.rooms = state.rooms.filter(r => r.id !== state.roomIdToDelete); hideModal(elements.deleteConfirm.modal); renderRoomList(); };
+
+            // --- Initialization and Event Listener Setup ---
+            const addEventListeners = () => {
+                elements.header.backButton.addEventListener('click', goBack);
+                elements.quickMenu.button.addEventListener('click', () => toggleQuickMenu());
+                elements.modals.backdrop.addEventListener('click', () => { toggleQuickMenu(true); hideModal(elements.deliveryModal.modal, false); hideModal(elements.admin.loginModal, false); hideModal(elements.deleteConfirm.modal, false); hideModal(elements.overduePayment.modal, false); hideModal(elements.qrModal.modal, false); hideModal(elements.termsModal.modal, false); hideModal(elements.subscriptionPayment.modal, false); hideModal(elements.cancelSubscription.modal, false); });
+                elements.quickMenu.deliveryButton.addEventListener('click', () => { toggleQuickMenu(true); showModal(elements.deliveryModal.modal); elements.deliveryModal.content.classList.add('animate-slide-up'); });
+                elements.deliveryModal.submitButton.addEventListener('click', handleSubmitTrackingNumber);
+                elements.deliveryModal.closeButton.addEventListener('click', () => hideModal(elements.deliveryModal.modal));
+                elements.deliveryModal.input.addEventListener('input', formatTrackingNumber);
+                elements.admin.settingsButton.addEventListener('click', () => showModal(elements.admin.loginModal));
+                elements.admin.loginForm.addEventListener('submit', handleAdminLogin);
+                elements.admin.closeLoginModal.addEventListener('click', () => hideModal(elements.admin.loginModal));
+                elements.admin.addRoomForm.addEventListener('submit', handleAddRoom);
+                elements.admin.roomList.addEventListener('click', (e) => { const btn = e.target.closest('.delete-room-button'); if (btn) { const id = parseInt(btn.dataset.roomId, 10); state.roomIdToDelete = id; const room = state.rooms.find(r => r.id === id); if(room) elements.deleteConfirm.text.innerHTML = `「<strong>${room.roomName} / ${room.residentName}</strong>」を削除します。<br>よろしいですか？`; showModal(elements.deleteConfirm.modal); } });
+                elements.deleteConfirm.cancelButton.addEventListener('click', () => hideModal(elements.deleteConfirm.modal));
+                elements.deleteConfirm.confirmButton.addEventListener('click', handleDeleteRoom);
+                elements.parcelLocker.listContainer.addEventListener('click', handleUnlockParcel);
+                elements.overduePayment.payButton.addEventListener('click', handlePayOverdueFee);
+                elements.overduePayment.cancelButton.addEventListener('click', () => hideModal(elements.overduePayment.modal));
+                elements.qrModal.closeButton.addEventListener('click', () => hideModal(elements.qrModal.modal));
+                elements.home.goToLockerButton.addEventListener('click', () => { if (state.hasAgreedToLockerTerms) { showView('parcel-locker-view'); } else { showModal(elements.termsModal.modal); } });
+                elements.quickMenu.lockerButton.addEventListener('click', () => { toggleQuickMenu(true); if (state.hasAgreedToLockerTerms) { showView('parcel-locker-view'); } else { showModal(elements.termsModal.modal); } });
+                elements.termsModal.agreeButton.addEventListener('click', () => { state.hasAgreedToLockerTerms = true; hideModal(elements.termsModal.modal); showView('parcel-locker-view'); });
+                elements.termsModal.disagreeButton.addEventListener('click', () => hideModal(elements.termsModal.modal));
+                elements.subscriptionPayment.payButton.addEventListener('click', handleConfirmSubscription);
+                elements.subscriptionPayment.cancelButton.addEventListener('click', () => hideModal(elements.subscriptionPayment.modal));
+                elements.cancelSubscription.confirmButton.addEventListener('click', handleCancelSubscription);
+                elements.cancelSubscription.backButton.addEventListener('click', () => hideModal(elements.cancelSubscription.modal));
+            };
+
+            const init = () => {
+                const today = new Date();
+                const deadline1 = new Date(); deadline1.setDate(today.getDate() + 2);
+                const arrival1 = new Date(); arrival1.setDate(today.getDate() - 1);
+                const deadline2 = new Date(); deadline2.setDate(today.getDate() - 3);
+                const arrival2 = new Date(); arrival2.setDate(today.getDate() - 7);
+                state.parcels = [ { id: 'parcel-ok', arrivalDate: arrival1.toISOString().split('T')[0], deadline: deadline1.toISOString().split('T')[0], overdueDays: 0, usageCount: 3, totalUsage: 20 }, { id: 'parcel-due', arrivalDate: arrival2.toISOString().split('T')[0], deadline: deadline2.toISOString().split('T')[0], overdueDays: 3, usageCount: 3, totalUsage: 20 }, ];
+                addEventListeners();
+                elements.deliveryModal.submitButton.disabled = true;
+            };
+
+            init();
+        });
+    </script>
+</body>
+</html>
